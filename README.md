@@ -1,5 +1,5 @@
 # Extending the use of privileged information paradigm to logistic regression
-> LRIT+ and LR+ methods
+> LRIT+ and LR+ classifiers
 
 [python-img]: https://img.shields.io/badge/Made%20with-Python-blue
 [ama-img]: https://img.shields.io/badge/Ask%20me-anything-yellowgreen
@@ -15,14 +15,14 @@ This repository contains the code for the paper "Extending the use of privileged
 ## Content
 
 - **code:**
-  - _lrplus.py_. Main file with LRIT+ and LR+ algorithms.
-  - _load_UCIdatasets.py_. Load UCI datasets examples.
-  - _UCIdatasets.py_. Implementation of LRIT+ and LR+ on UCI datasets.
-  - _mnistplus.py_. Implementation of LRIT+ and LR+ on MNIST+ dataset.
-  - _mackey-glass.py_. Implementation of LRIT+ and LR+ on Mackey-Glass time series datasets.
+  - `lrplus.py`. Main file with LRIT+ and LR+ algorithms.
+  - `load_UCIdatasets.py`. Load UCI datasets examples.
+  - `UCIdatasets.py`. Implementation of LRIT+ and LR+ on UCI datasets.
+  - `mnistplus.py`. Implementation of LRIT+ and LR+ on MNIST+ dataset.
+  - `mackey-glass.py`. Implementation of LRIT+ and LR+ on Mackey-Glass time series datasets.
 - **data:**
-  - _mnistplus_. MNIST+ dataset. Validation, train and test cohorts.
-  - _mackey-glass_.   Mackey-Glass dataset for different data sizes ( N = 500, 1000, 1500, 2000)
+  - `mnistplus`. MNIST+ dataset. Validation, train and test cohorts.
+  - `mackey-glass`.   Mackey-Glass dataset for different data sizes ( N = 500, 1000, 1500, 2000)
 
 
 
@@ -41,32 +41,32 @@ python lrplus.py
 
 ## Description of the classifiers
 
-> #### LRIT+. Logit model.
+#### LRIT+. Logit model.
 
-**LRIT_plus**(_l = 0, optimizer = 'cvx'_)
-
-  - **_l: float, default = 0_**
-  
-    "_l_" is directly proportional to the regularization term: bigger values of "_l_" imply stronger regularization.
-    
-  - **_optimizer: {'cvx', 'scipy'}, default = 'cvx'_**
-  
-    Package used to obtain the optimal parameters of the loss function.
-    - 'cvx'. [CVXPY](https://www.cvxpy.org/tutorial/intro/index.html) library is implemented. This method is usually faster.
-    - 'scipy'. [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html) from [SCIPY](https://docs.scipy.org/doc/scipy/index.html) library is used.
-
-
+>**LRIT_plus**(_l = 0, optimizer = 'cvx'_)
+>
+>  - **_l: float, default = 0_**
+>  
+>    "_l_" is directly proportional to the regularization term: bigger values of "_l_" imply stronger regularization.
+>    
+>  - **_optimizer: {'cvx', 'scipy'}, default = 'cvx'_**
+>  
+>    Package used to obtain the optimal parameters of the loss function.
+>    - 'cvx'. [CVXPY](https://www.cvxpy.org/tutorial/intro/index.html) library is implemented. This method is usually faster.
+>    - 'scipy'. [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html) from [SCIPY](https://docs.scipy.org/doc/scipy/index.html) library is used.
 
 
-> #### LR+. Posterior probabilities model.
 
-**LR_plus**(_l = 0_)
 
-  - **_l: float, default = 0_**
-  
-    "_l_" is directly proportional to the regularization term: bigger values of "_l_" imply stronger regularization.
- 
----
+#### LR+. Posterior probabilities model.
+
+>**LR_plus**(_l = 0_)
+>
+>  - **_l: float, default = 0_**
+>  
+>    "_l_" is directly proportional to the regularization term: bigger values of "_l_" imply stronger regularization.
+> 
+
 
 | Method | Description | 
 | -----: | :--- | 
@@ -111,6 +111,9 @@ clas.fit(X_train_priv, X_train, wp, bp)
 pre = clas.predict(X_test_regular)
 ```
 
+## Contact
+
+Mario Martinez García - mariomartgarcia@gmail.com
 
 ## References
 
