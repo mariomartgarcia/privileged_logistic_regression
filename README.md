@@ -35,8 +35,14 @@ Learning Using Privileged Information (LUPI) paradigm [^1] exploits privileged f
 
 
 
+```git
+git clone https://github.com/mariomartgarcia/privileged_logistic_regression
+```
 
-
+```git
+cd privileged_logistic_regression/code
+python lrplus.py
+```
 
 ## Description of the classifiers
 
