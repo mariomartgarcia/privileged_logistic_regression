@@ -9,6 +9,8 @@
 
 This repository contains the code for the paper "Extending the use of privileged information paradigm to logistic regression"
 
+<img width="944" alt="Screenshot 2023-01-31 at 09 53 26" src="https://user-images.githubusercontent.com/63496191/215713753-297dd1c8-5147-4357-903a-2465ff702941.png">
+
 
 ## Abstract
 
