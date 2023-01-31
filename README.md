@@ -14,7 +14,7 @@ This repository contains the code for the paper "Extending the use of privileged
 
 ## Abstract
 
-Learning Using Privileged Information (LUPI) paradigm exploits privileged features, not available at the testing stage, as additional information for training models. In this paper, the privileged information paradigm is addressed from the perspective of logistic regression. A reduced set of methods have addressed the handling of privileged information, but its implementation on logistic regression had not yet been formalised. Hence, two algorithms, LRIT+ and LR+, learned using the privileged information paradigm and preserving the interpretability of conventional logistic regression, are proposed. For its development, a traditional logistic regression trained with all available features, privileged and regular, is projected onto the solution space that exclusively contains regular features. The projection to obtain the model parameters is performed by the minimization of two different squared losses functions: for LRIT+ classifier the function is governed by logit terms and for LR+  by posterior probabilities. Experimental results on datasets report improvements of our proposals over the performance of traditional logistic regression learned without privileged information.
+Learning Using Privileged Information (LUPI) paradigm [^1] exploits privileged features, not available at the testing stage, as additional information for training models. In this paper, the privileged information paradigm is addressed from the perspective of logistic regression. A reduced set of methods have addressed the handling of privileged information, but its implementation on logistic regression had not yet been formalised. Hence, two algorithms, LRIT+ and LR+, learned using the privileged information paradigm and preserving the interpretability of conventional logistic regression, are proposed. For its development, a traditional logistic regression trained with all available features, privileged and regular, is projected onto the solution space that exclusively contains regular features. The projection to obtain the model parameters is performed by the minimization of two different squared losses functions: for LRIT+ classifier the function is governed by logit terms and for LR+  by posterior probabilities. Experimental results on datasets report improvements of our proposals over the performance of traditional logistic regression learned without privileged information.
 
 
 ## Content
@@ -54,6 +54,9 @@ Learning Using Privileged Information (LUPI) paradigm exploits privileged featur
     - 'cvx'. [CVXPY](https://www.cvxpy.org/tutorial/intro/index.html) library is implemented. This method is usually faster.
     - 'scipy'. [scipy.optimize](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html) from [SCIPY](https://docs.scipy.org/doc/scipy/index.html) library is used.
 
+
+
+
 > #### LR+. Posterior probabilities model.
 
 **LR_plus**(_l = 0_)
@@ -61,10 +64,25 @@ Learning Using Privileged Information (LUPI) paradigm exploits privileged featur
   - **_l: float, default = 0_**
   
     "_l_" is directly proportional to the regularization term: bigger values of "_l_" imply stronger regularization.
+ 
+---
+
+| Method | Description | 
+| -----: | :--- | 
+|   **fit(X', X, $\omega$', $\beta$')**     |    Fit the model according to regular and privileged features X', regular features X and  ( $\omega$ ', $\beta$') parameters of the unreal privileged model  |  
+|   **predict(X)**      |    Predict class lables for samples in X   | 
+|    **predict_proba(X)**     |   Probability estimates    | 
+
+| Attribute | Description | 
+| -----: | :--- | 
+|      **coef_()**    | ndarray of shape (1, n_features).  Coefficient of the features in the decision function.    | 
+|    **intercept_()**      |  ndarray of shape (1,).   Intercept (a.k.a. bias) added to the decision function.   | 
     
+## Example of use
 
 ## References
-  
+
+[^1]: Vapnik, V., Vashist, A.: A new learning paradigm: Learning using privileged information. Neural Networks 22(5), 544–557 (2009)
   
   
   
