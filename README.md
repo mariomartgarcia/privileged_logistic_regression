@@ -84,7 +84,7 @@ python lrplus.py
 |      **coef_()**    | ndarray of shape (1, n_features).  Coefficient of the features in the decision function.    | 
 |    **intercept_()**      |  ndarray of shape (1,).   Intercept (a.k.a. bias) added to the decision function.   | 
     
-## Example of use
+## Example 
 
 Formulation of the method:
 
