@@ -9,7 +9,7 @@
 
 This repository contains the code for the paper "Extending the use of privileged information paradigm to logistic regression"
 
-<img width="944" alt="Screenshot 2023-01-31 at 09 53 26" src="https://user-images.githubusercontent.com/63496191/215713753-297dd1c8-5147-4357-903a-2465ff702941.png">
+<img width="512" alt="Screenshot 2023-01-31 at 13 29 33" src="https://user-images.githubusercontent.com/63496191/215760145-fa62ca77-d303-4ddd-a563-033d44a7fbfa.png">
 
 
 ## Abstract
@@ -79,6 +79,37 @@ Learning Using Privileged Information (LUPI) paradigm [^1] exploits privileged f
 |    **intercept_()**      |  ndarray of shape (1,).   Intercept (a.k.a. bias) added to the decision function.   | 
     
 ## Example of use
+
+Formulation of the method:
+
+- _X_train_. Samples with regular features for the training set. 
+- _X_train_priv_. Samples with regular and privileged features for the training set. 
+- _y_train_. Output of the training samples.
+- _X_test_. Samples with regular features for the test set
+
+
+1. Train a standard logistic regression (sklearn package is recommended) with _X_train_priv_ (regular and privileged features) to obtain the parameters ( $\omega$ ', $\beta$'). Note that hyperparameter tuning can be done to obtain a better performance.
+
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression()
+lr.fit(X_train_priv, y_train)
+wp = lr.coef_
+bp = lr.intercept_
+```
+
+2. LR+ classifier training and predictions.
+
+```python
+import lrplus as lrp
+
+clas = lrp.LR_plus()
+clas.fit(X_train_priv, X_train, wp, bp)
+pre = clas.predict(X_test_regular)
+```
+
 
 ## References
 
