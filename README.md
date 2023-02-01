@@ -20,6 +20,7 @@ This repository contains the code for the paper "Extending the use of privileged
   - `UCIdatasets.py`. Implementation of LRIT+ and LR+ on UCI datasets.
   - `mnistplus.py`. Implementation of LRIT+ and LR+ on MNIST+ dataset.
   - `mackey-glass.py`. Implementation of LRIT+ and LR+ on Mackey-Glass time series datasets.
+  - `tools.py`. Used functions.
 - **data:**
   - `mnistplus`. MNIST+ dataset. Validation, train and test cohorts.
   - `mackey-glass`.   Mackey-Glass dataset for different data sizes ( N = 500, 1000, 1500, 2000)
@@ -113,7 +114,7 @@ pre = clas.predict(X_test_regular)
 
 ## Contact
 
-Mario Martinez García - mariomartgarcia@gmail.com
+Mario Martínez García - mariomartgarcia@gmail.com
 
 ## References
 
