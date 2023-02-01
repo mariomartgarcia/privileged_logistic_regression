@@ -1,4 +1,4 @@
-# Extending the use of privileged information paradigm to logistic regression
+
 > LRIT+ and LR+ classifiers
 
 [python-img]: https://img.shields.io/badge/Made%20with-Python-blue
