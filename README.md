@@ -36,16 +36,21 @@ This repository contains the code for the paper _"Extending the use of privilege
 
 ## How to Install LRIT+ and LR+
 
-
-
-```git
-git clone https://github.com/mariomartgarcia/privileged_logistic_regression
-```
+Step 1: Download the repository.
 
 ```git
+git clone https://github.com/mariomartgarcia/privileged_logistic_regression 
 cd privileged_logistic_regression/code
-python lrplus.py
 ```
+
+Step 2: Load the library `lrplus.py`.
+
+```python
+import lrplus as lrp
+lrpy = lrp.LR_plus()
+```
+
+Alternative: Place `lrplus.py` file in the folder where you are working and continue with step 2.
 
 ## Description of the classifiers
 
