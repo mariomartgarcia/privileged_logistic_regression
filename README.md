@@ -30,7 +30,7 @@ This repository contains the code for the paper _"Extending the use of privilege
   - `tools.py`. Used functions.
 - **data:**
   - `mnistplus`. MNIST+ dataset. Validation, train and test cohorts.
-  - `UCI_dataset`. Obesity and wine UCI datasets.
+  - `UCI_dataset`. Obesity and Wine UCI datasets.
   - `mackey-glass`.   Mackey-Glass dataset for different data sizes ( N = 500, 1000, 1500, 2000)
 
 
