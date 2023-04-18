@@ -138,6 +138,4 @@ class LR_plus():
         
     def intercept_(self):
         return self.b 
-        
-
 
