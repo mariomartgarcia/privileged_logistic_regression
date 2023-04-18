@@ -175,6 +175,8 @@ ACC_lb = []
 ACC_logit = []
 ACC_proba = []
 
+Tbs = []
+Tm = []
 
 for i in tds:
     acc_lb = []
@@ -184,6 +186,10 @@ for i in tds:
     n_er_lb = []
     n_er_logit = []
     n_er_proba = []
+    
+    bsp = []
+    mp = []
+    
 
     print('--------------')
     print(i)
@@ -253,7 +259,7 @@ s = pd.read_csv(r'/Users/mmartinez/Desktop/Code/Python/LRPI/rep_Vapnik30.csv')
 ACC_logit = s['ACC_logit']
 ACC_proba = s['ACC_proba']
 ACC_lb = s['ACC_lb']
-BS = s['BS']
+#BS = s['BS']
 
 # %%
 #==============================================
@@ -263,15 +269,22 @@ color_lb = 'firebrick'
 color_realit = 'darkorange'
 color_realp = 'royalblue'
 
+color_lb = 'green'
+color_realit = 'red'
+color_realp = 'blue'
+
 tds = [40, 50, 60, 70, 80, 90]
-plt.plot(tds, np.array(ACC_lb), 'o--',  c = color_lb, label = r'$\hat{\Omega}_{B}$', alpha = 0.8)
-plt.plot(tds, np.array(ACC_logit), 'o--', c = color_realit, label = 'LRIT+', alpha = 0.8)
-plt.plot(tds, np.array(ACC_proba), 'o--', c = color_realp, label = 'LR+', alpha = 0.8)
+plt.figure(figsize=(9,4))
+plt.plot(tds, np.array(ACC_lb), 'o--',  c = color_lb, label = r'LR$_{LB}$', alpha = 0.8,  markersize=10)
+plt.plot(tds, np.array(ACC_logit), 'o--', c = color_realit, label = 'LOGIT+', alpha = 0.8,  markersize=10)
+plt.plot(tds, np.array(ACC_proba), 'o--', c = color_realp, label = 'LRPROB+', alpha = 0.8,  markersize=10)
 plt.grid(True)
-plt.ylabel('Accuracy', fontweight="bold")
-plt.xlabel('Training data size', fontweight="bold")
-plt.legend()
-#plt.savefig('Photos/mnist/mnist30.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+plt.xticks(fontsize = 19)
+plt.yticks(fontsize = 19)
+plt.ylabel('Accuracy', fontweight="bold", fontsize = 20)
+plt.xlabel('Training data size', fontweight="bold", fontsize = 20)
+plt.legend(fontsize = 20)
+plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/mnist/mnist30.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
 
         
