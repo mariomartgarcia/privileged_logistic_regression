@@ -12,14 +12,14 @@ warnings.filterwarnings("ignore")
 
 
 
-url_val_features = r'/Users/mmartinez/Desktop/Code/Data/mnist+/val_features.txt'
-url_val_labels = r'/Users/mmartinez/Desktop/Code/Data/mnist+/val_labels.txt'
-url_train_features = r'/Users/mmartinez/Desktop/Code/Data/mnist+/train_features.txt'
-url_train_labels = r'/Users/mmartinez/Desktop/Code/Data/mnist+/train_labels.txt'
-url_train_PFfeatures = r'/Users/mmartinez/Desktop/Code/Data/mnist+/train_PFfeatures.txt'
-url_train_YYfeatures = r'/Users/mmartinez/Desktop/Code/Data/mnist+/train_YYfeatures.txt'
-url_test_features = r'/Users/mmartinez/Desktop/Code/Data/mnist+/test_features.txt'
-url_test_labels = r'/Users/mmartinez/Desktop/Code/Data/mnist+/test_labels.txt'
+url_val_features = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/val_features.txt'
+url_val_labels = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/val_labels.txt'
+url_train_features = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/train_features.txt'
+url_train_labels = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/train_labels.txt'
+url_train_PFfeatures = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/train_PFfeatures.txt'
+url_train_YYfeatures = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/train_YYfeatures.txt'
+url_test_features = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/test_features.txt'
+url_test_labels = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/mnist+/test_labels.txt'
 
 # %%
 

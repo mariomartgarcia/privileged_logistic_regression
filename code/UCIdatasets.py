@@ -19,9 +19,9 @@ warnings.filterwarnings("ignore")
 # DATASETS (select what you want)
 #===================================
 
-X, y = bs.breast_cancer()
+#X, y = bs.breast_cancer()
 #X, y = bs.obesity()
-#X, y = bs.wine()
+X, y = bs.wine()
 
 
 
@@ -361,6 +361,7 @@ color_realp = 'royalblue'
 
 # %%
 #GENERAL
+sns.set_theme(style="whitegrid")
 plt.figure(figsize=(17,4))
 plt.grid()
 plt.title('Wine' + ' | Parallel Comparison of Parameters | #PI = 2', fontweight="bold", fontsize = 14)
@@ -377,5 +378,5 @@ plt.grid()
 plt.legend(fontsize = 13)
 plt.xticks(rotation=90, fontsize = 13)
 plt.yticks(fontsize = 13)
-plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/standard_datasets/' + texto + 'parametersPI.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+#plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/standard_datasets/' + texto + 'parametersPI.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()

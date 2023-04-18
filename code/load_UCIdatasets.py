@@ -9,11 +9,11 @@ import tools as tl
 warnings.filterwarnings("ignore")
 
 #=========================================================================================================
-url_obesity = r'/Users/mmartinez/Desktop/Code/Data/Random_BBDD/ObesityDataSet_raw_and_data_sinthetic.csv'
-url_wine = r'/Users/mmartinez/Desktop/Code/Data/Random_BBDD/winequality-white.csv'
-url_heart = r'/Users/mmartinez/Desktop/Code/Data/framingham.csv'
-url_wm = r'/Users/mmartinez/Desktop/Code/Data/WM_data.csv'
-url_heart2 = r'/Users/mmartinez/Desktop/Code/Data/heart.csv'
+url_obesity = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/UCIdataset/ObesityDataSet_raw_and_data_sinthetic.csv'
+url_wine = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/UCIdataset/winequality-white.csv'
+url_heart = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/Discussion_dataset/framingham.csv'
+url_wm = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/Discussion_dataset/WM_data.csv'
+url_heart2 = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/Discussion_dataset/heart.csv'
 #=========================================================================================================
 
 def data(frame):
