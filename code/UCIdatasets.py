@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 import warnings
-from sklearn.metrics import  accuracy_score
-from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import  accuracy_score, brier_score_loss
+from sklearn.linear_model import LogisticRegression, LinearRegression
 import lrplus as lr
 import load_UCIdatasets as bs
 import matplotlib.pyplot as plt
@@ -20,8 +20,10 @@ warnings.filterwarnings("ignore")
 #===================================
 
 X, y = bs.breast_cancer()
-#X, y = bs.drugs()
+#X, y = bs.obesity()
 #X, y = bs.wine()
+
+
 
 
 X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
@@ -53,6 +55,8 @@ values = np.abs(coef.coef).sort_values(ascending = False)
 names = list(coef.names[values.index])
 log_coef = pd.DataFrame({'names': names , 'value': values })
 
+
+
 # %%
 
 #===============================================================
@@ -61,8 +65,8 @@ log_coef = pd.DataFrame({'names': names , 'value': values })
 # DEVELOPMENT
 
 
-number_pi = 5     #Up to 4 privileged features
-repetitions = 1  #Number of repetitions for each PI feature
+number_pi = 5    #Up to 4 privileged features
+repetitions = 30  #Number of repetitions for each PI feature
 
 
 r = random.sample(range(500), repetitions)  #Seed number without replacement
@@ -71,12 +75,14 @@ q = {}
 #Results boxes for every seed
 TACClb, TACCub, TACCreal_it, TACCreal_p = [], [], [], []
 Tstdlb, Tstdub, Tstdreal_it, Tstdreal_p  = [], [], [], []
+Tmedias, Tbrier = [], []
 
 for i in range(1, number_pi):
     
     #Results boxes for every seed
     ACClb, ACCub, ACCreal_it, ACCreal_p = [], [], [], []
-
+    medias_p, brier_p = [], []
+    
     print(i)
     print('-----')
     for k in r:
@@ -88,7 +94,7 @@ for i in range(1, number_pi):
         acc_ub, mae_ub = [], []
         acc_realit, mae_realit  = [], []
         acc_realp, mae_realp = [], []
-
+        medias, brier = [], []
         
         for h in range(cv):
             X_train = dr['X_train' + str(h)]
@@ -116,9 +122,15 @@ for i in range(1, number_pi):
             omega = lg.coef_[0]
             beta = lg.intercept_
             pre = lg.predict(X_test)
+            proba = lg.predict_proba(X_test)
+            
+            
+            medias.append(np.mean([proba[i][1] if pre[i] == 1 else proba[i][0] for i in range(len(pre))]))
+            brier.append(brier_score_loss(y_test, proba[:,1]))
+            
             
             acc_ub.append(accuracy_score(y_test, pre))
-
+            
             #-------------------------------------------
             #Base model
             lg = LogisticRegression()    
@@ -149,6 +161,9 @@ for i in range(1, number_pi):
         #Base and Unreal Privileged model
         ACClb.append(np.mean(acc_lb))
         ACCub.append(np.mean(acc_ub))
+        
+        brier_p.append(np.mean(brier))
+        medias_p.append(np.mean(medias))
 
         #LRIT+
         ACCreal_it.append(np.mean(acc_realit))
@@ -168,6 +183,9 @@ for i in range(1, number_pi):
     Tstdlb.append(np.std(ACClb))
     TACCub.append(np.mean(ACCub))
     Tstdub.append(np.std(ACCub))
+    
+    Tmedias.append(np.mean(medias_p))
+    Tbrier.append(np.mean(brier_p))
 
 
     #LRIT+
@@ -177,16 +195,35 @@ for i in range(1, number_pi):
     #LR+
     TACCreal_p.append(np.mean(ACCreal_p))
     Tstdreal_p.append(np.std(ACCreal_p))
+# %%
+
+#=====================================================
+# LOAD THE DATA ALREADY COMPUTED
+#=====================================================
 
 
+texto = 'obesity/ob'
+s = pd.read_csv( r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/standard_datasets/' + texto + '_5_30.csv')
+#s = pd.read_csv('Photos/standard_datasets/' + texto + '/5_30bc.csv')
+
+dim = 4
+TACClb = s['TACClb'][0:dim]
+TACCub = s['TACCub'][0:dim]
+TACCreal_it = s['TACCreal_it'][0:dim]
+TACCreal_p = s['TACCreal_p'][0:dim]
+
+Tstdlb = s['Tstdlb'][0:dim]
+Tstdub = s['Tstdub'][0:dim]
+Tstdreal_it = s['Tstdreal_it'][0:dim]
+Tstdreal_p = s['Tstdreal_p'][0:dim]
 
 # %%
 #=====================================================
 # N TIME. 5-CV. INCREASING THE NUMBER OF PI FEATURES
 #=====================================================
-#text = 'spam/s'
-name = 'Breast Cancer'
 
+name = 'Obesity'
+#texto = 'breast_cancer/bc'
 
 # GRAPHICAL REPRESENTATION
 number_pi = 5
@@ -202,9 +239,9 @@ color_realit = 'darkorange'
 color_realp = 'royalblue'
 
 #Lines
-plt.figure(figsize=(7.5,4))
-plt.plot(pilist, TACClb, 'D-.', c = color_lb, label = r'$\hat{\Omega}_{B}$')
-plt.plot(pilist, TACCub, c = color_ub, label = r'$\hat{\Omega}_{UP}$', marker = 'o')
+plt.figure(figsize=(6,4))
+plt.plot(pilist, TACClb, 'D-.', c = color_lb, label = r'LR$_{B}$')
+plt.plot(pilist, TACCub, c = color_ub, label = r'LR$_{UP}$', marker = 'o')
 plt.plot(pilist, TACCreal_it, 'o--', c = color_realit, label = 'LRIT+')
 plt.plot(pilist, TACCreal_p, 'o--', c = color_realp, label = 'LR+')
 
@@ -214,13 +251,13 @@ plt.fill_between(pilist, np.array(TACCub) - np.array(Tstdub),  np.array(TACCub) 
 plt.fill_between(pilist, np.array(TACCreal_it) - np.array(Tstdreal_it),  np.array(TACCreal_it) + np.array(Tstdreal_it), alpha = 0.1, color = color_realit, edgecolor = 'black', facecolor = color_realit, linestyle = '--')
 plt.fill_between(pilist, np.array(TACCreal_p) - np.array(Tstdreal_p),  np.array(TACCreal_p) + np.array(Tstdreal_p), alpha = 0.1, color = color_realp, edgecolor = 'black', facecolor = color_realp, linestyle = '--')
 
-plt.title(name, fontweight="bold", fontsize = 14)
-plt.ylabel('Accuracy', fontweight="bold", fontsize = 14)
-plt.xlabel('Number of privileged features', fontweight="bold", fontsize = 14)
-plt.xticks(pilist, fontsize = 14)
-plt.yticks(fontsize = 14)
-plt.legend(fontsize = 13)
-#plt.savefig('Photos/standard_datasets/'+ texto +'_n_privileged.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+plt.title(name, fontweight="bold", fontsize = 16)
+plt.ylabel('Accuracy', fontweight="bold", fontsize = 16)
+plt.xlabel('Number of privileged features', fontweight="bold", fontsize = 16)
+plt.xticks(pilist, fontsize = 16)
+plt.yticks(fontsize = 16)
+plt.legend(fontsize = 14, loc = 'best', bbox_to_anchor=(0.5, 0.4, 0.5, 0.5))
+plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/standard_datasets/'+ texto +'_n_privilegedR.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
 #plt.show(sns)
 
@@ -252,7 +289,7 @@ plt.xlabel('Number of privileged features', fontweight="bold", fontsize = 14)
 plt.xticks(pilist, fontsize = 14)
 plt.yticks(fontsize = 14)
 plt.legend(fontsize = 13)
-#plt.savefig('Photos/standard_datasets/' + texto +'_gain.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+#plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/standard_datasets/' + texto +'_gain.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
 
 
@@ -263,7 +300,7 @@ plt.show()
 #=================================================================
 #WITH PI REPRESENTATION
 #======================
-
+texto = 'wine/w'
 #----------------------
 number_pi = 2
 pi_var =  names[0:number_pi]
@@ -284,7 +321,7 @@ beta = lg.intercept_
 mask = [w  for w, j in enumerate(list(X.columns)) if j in pi_var]
 omega_up = [j for w, j in enumerate(omega) if w not in mask]
 w_priv = [j for w, j in enumerate(omega) if w in mask]
-omega_up = omega_up + [0] + w_priv
+omega_up = omega_up + w_priv
 
 #-------------------------------------------
 #Base model
@@ -306,15 +343,15 @@ w_p = list(alp.coef_())
 
 #-------------------------------------------
 #Add zero for parameters of the privileged features
-for i in range(0, number_pi+1):
-    omega_b.append(0)
-    w_it.append(0)
-    w_p.append(0)
+for i in range(0, number_pi):
+    omega_b.append(None)
+    w_it.append(None)
+    w_p.append(None)
     
 #-------------------------------------------
 #Graphic representation
     
-features = list(Xr.columns) + ['----------'] + pi_var
+features = list(Xr.columns) + pi_var
 
 #Colors
 color_lb = 'firebrick'
@@ -326,17 +363,19 @@ color_realp = 'royalblue'
 #GENERAL
 plt.figure(figsize=(17,4))
 plt.grid()
-plt.title(name + ' | Parallel Comparison of Parameters | #PI = 2', fontweight="bold", fontsize = 14)
-plt.plot(features, omega_up, 'o--', c = color_ub , label = r'$\hat{\Omega}_{UP}$')
-plt.plot(features, omega_b, 'o--', c = color_lb, label = r'$\hat{\Omega}_{B}$')
+plt.title('Wine' + ' | Parallel Comparison of Parameters | #PI = 2', fontweight="bold", fontsize = 14)
+plt.plot(features, omega_up, 'o--', c = color_ub , label = r'LR$_{UP}$')
+plt.plot(features, omega_b, 'o--', c = color_lb, label = r'LR$_{B}$')
+
 plt.plot(features, w_it, 'o--', c = color_realit, label = 'LRIT+', alpha = 0.8)
 plt.plot(features, w_p, 'o--', c = color_realp, label = 'LR+', alpha = 0.8) #para el vino 0.6
 plt.xlabel('Features', fontweight="bold", fontsize = 14)
 plt.ylabel('Value', fontweight="bold", fontsize = 14)
-plt.axvline(x = Xr.shape[1], color = 'black')
+#plt.axvspan(xmin = 8.2, xmax = 8.22, color = 'black')
+plt.axvline(x = 8.15, linewidth = 3,  color = 'black')
 plt.grid()
 plt.legend(fontsize = 13)
 plt.xticks(rotation=90, fontsize = 13)
 plt.yticks(fontsize = 13)
-#plt.savefig('Photos/standard_datasets/'+ text +'parametersPI.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/standard_datasets/' + texto + 'parametersPI.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
