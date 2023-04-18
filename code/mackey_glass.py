@@ -68,8 +68,8 @@ def mackey_glass(n, T, tau = 17):
     y = mg.output
     return X, y, x
 
-# %%
 
+# %%
 #=====================================================
 # N TIME. 5-CV. For different T and N
 #=====================================================
@@ -79,7 +79,7 @@ def mackey_glass(n, T, tau = 17):
 #3, 5, 8, 12
 
 
-T = 3
+T = 5
 repetitions = 30  #Number of repetitions for each PI feature
 r = random.sample(range(500), repetitions)  #Seed number without replacement
 
@@ -194,10 +194,30 @@ for i in [500, 1000, 1500, 2000]:
     Tstdreal_p.append(np.std(ACCreal_p))
 
 # %%
+texto = 't12/t12'
+s = pd.read_csv( r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/mackeyglass/' + texto + 'dataMG.csv')
+#s = pd.read_csv('Photos/standard_datasets/' + texto + '/5_30bc.csv')
+
+dim = 4
+TACClb = s['ACClb'][0:dim]
+TACCub = s['ACCub'][0:dim]
+TACCreal_it = s['ACCreal_it'][0:dim]
+TACCreal_p = s['ACCreal_p'][0:dim]
+
+Tstdlb = s['stdlb'][0:dim]
+Tstdub = s['stdub'][0:dim]
+Tstdreal_it = s['stdreal_it'][0:dim]
+Tstdreal_p = s['stdreal_p'][0:dim]
+
+
+
+# %%
+
+
 #=====================================================
 # N TIME. 5-CV. REPRESENTATION
 #=====================================================
-texto = 't12/t12'
+#texto = 't3/t3'
 # GRAPHICAL REPRESENTATION
 
 pilist = [500, 1000, 1500, 2000]
@@ -213,8 +233,8 @@ color_realp = 'royalblue'
 
 #Lines
 plt.figure(figsize=(7.5,4))
-plt.plot(pilist, TACClb, 'D-.', c = color_lb, label = r'$\hat{\Omega}_{B}$')
-plt.plot(pilist, TACCub, c = color_ub, label = r'$\hat{\Omega}_{UP}$', marker = 'o')
+plt.plot(pilist, TACClb, 'D-.', c = color_lb, label = r'LR$_{B}$')
+plt.plot(pilist, TACCub, c = color_ub, label = r'LR$_{UP}$', marker = 'o')
 plt.plot(pilist, TACCreal_it, 'o--', c = color_realit, label = 'LRIT+')
 plt.plot(pilist, TACCreal_p, 'o--', c = color_realp, label = 'LR+')
 
@@ -230,7 +250,7 @@ plt.xlabel('Data Size (N)', fontweight="bold", fontsize = 14)
 plt.xticks(pilist, fontsize = 14)
 plt.yticks(fontsize = 14)
 plt.legend(fontsize = 13)
-#plt.savefig('Photos/mackeyglass/'+ texto +'trainMG.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/mackeyglass/' + texto +'trainMG.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
 
 
@@ -257,6 +277,6 @@ plt.xlabel('Data Size (N)', fontweight="bold", fontsize = 14)
 plt.xticks(pilist, fontsize = 14)
 plt.yticks(fontsize = 14)
 plt.legend(fontsize = 13)
-#plt.savefig('Photos/mackeyglass/' + texto +'privgainMG.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+plt.savefig(r'/Users/mmartinez/Desktop/Code/Python/LRPI/photos/mackeyglass/' + texto +'privgainMG.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
 
