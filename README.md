@@ -8,9 +8,7 @@ WARNING: Under construction
 
 [python-img]: https://img.shields.io/badge/Made%20with-Python-blue
 [ama-img]: https://img.shields.io/badge/Ask%20me-anything-yellowgreen
-[construction-img]: https://img.shields.io/badge/under-construction-red
 
-![cons][construction-img]
 ![Made with Python][python-img]
 ![Ask me anything][ama-img]
 
