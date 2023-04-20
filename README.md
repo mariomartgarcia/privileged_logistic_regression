@@ -1,5 +1,3 @@
-WARNING: Under construction
-
 
 # Extending the use of privileged information paradigm to logistic regression.
 
