@@ -22,14 +22,14 @@ This repository contains the code for the paper _"Extending the learning using p
   - `lrplus.py`. Main file with LRIT+ and LR+ algorithms.
   - `load_UCIdatasets.py`. Load UCI datasets examples.
   - `UCIdatasets.py`. Implementation of LRIT+ and LR+ on UCI datasets.
-  - `mnistplus.py`. Implementation of LRIT+ and LR+ on MNIST+ dataset.
-  - `mackey-glass.py`. Implementation of LRIT+ and LR+ on Mackey-Glass time series datasets.
+  - `mnist_plus.py`. Implementation of LRIT+ and LR+ on MNIST+ dataset.
+  - `mackey_glass.py`. Implementation of LRIT+ and LR+ on Mackey-Glass time series datasets.
   - `tools.py`. Used functions.
+  - `discussion.py`. Used functions.
 - **data:**
   - `mnistplus`. MNIST+ dataset. Validation, train and test cohorts.
   - `UCI_dataset`. Obesity and Wine UCI datasets.
-  - `mackey-glass`.   Mackey-Glass dataset for different data sizes ( N = 500, 1000, 1500, 2000)
-
+ 
 
 
 ## How to Install LRIT+ and LR+
@@ -124,7 +124,7 @@ pre = clas.predict(X_test_regular)
 
 ## Contact
 
-Mario Martínez García - mariomartgarcia@gmail.com
+Mario Martínez García - mmartinez@bcamath.org
 
 
 ## Citation
