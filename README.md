@@ -1,5 +1,5 @@
 
-# Extending the use of privileged information paradigm to logistic regression.
+# Extending the learning using privileged information paradigm to logistic regression
 
 
 > LRIT+ and LR+ classifiers
