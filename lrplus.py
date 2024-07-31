@@ -139,6 +139,90 @@ class LR_plus():
     def intercept_(self):
         return self.b 
     
+
+
+
+
+#=============================================================================
+                        #LR+ | SCIPY | SOLVER: 'LBFGS'#
+#=============================================================================
+
+class LR_plusKL():
+    #l número de instancias
+    #n número de variables involucradas
+    def __init__(self, l = 0, loss = 'ts' ):
+        if l < 0:
+            raise Exception("l hyperparameter must be 0 or a real positive number")
+        self.l = l
+    
+    def fit(self, Xc, Xr, omega, beta ):
+        
+        zp = np.matmul(Xc, omega.T) + beta
+        
+        self.zp = np.array(zp).reshape((1,-1))
+        self.Xr = Xr
+        
+        
+        ini = np.ones(self.Xr.shape[1] + 1 )
+        
+
+        if loss == 'ts':
+            result = so.minimize(self.kl_loss_ts, ini, method='L-BFGS-B')
+        if loss == 'st':
+            result = so.minimize(self.kl_loss_st, ini, method='L-BFGS-B')
+
+
+        self.w = result['x'][0:-1].reshape(1,-1)
+        self.b = result['x'][-1]
+        
+    def loss(self, w):
+       self.z = np.array(list(np.matmul(w[0:-1], self.Xr.transpose()) + w[-1])).reshape((1,-1))
+       pr = self.sigmoid(self.z)
+       up = self.sigmoid(self.zp)
+
+
+       d = np.sum((self.sigmoid(self.z)-self.sigmoid(self.zp))**2) + self.l * np.sum(w[0:-1]**2)
+       return d
+    
+    def kl_loss_ts(self, w):
+       self.z = np.array(list(np.matmul(w[0:-1], self.Xr.transpose()) + w[-1])).reshape((1,-1))
+       y_pred = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.z))])
+       y_upper = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.zp)) ])
+
+       d = np.sum(y_upper*np.log((y_upper/y_pred) + 1e-15), axis = 1) + self.l * np.sum(w[0:-1]**2)
+       return d
+    
+    def kl_loss_st(self, w):
+       self.z = np.array(list(np.matmul(w[0:-1], self.Xr.transpose()) + w[-1])).reshape((1,-1))
+       y_pred = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.z))])
+       y_upper = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.zp)) ])
+
+       d = np.sum(y_pred*np.log((y_pred/y_upper) + 1e-15), axis = 1) + self.l * np.sum(w[0:-1]**2)
+       return d
+    
+    
+    def sigmoid(self, x):
+        z = np.exp(-x)
+        return 1 / (1 + z)
+    
+    def predict(self, x):
+        x_dot_weights = np.matmul(self.w, x.transpose()) + self.b
+        probabilities = self.sigmoid(x_dot_weights.iloc[0])
+        pre = [1 if p > 0.5 else -1 for p in probabilities]
+        return  pre
+    
+    def predict_proba(self, x):
+        x_dot_weights = np.matmul(self.w, x.transpose()) + self.b
+        probabilities = self.sigmoid(x_dot_weights.iloc[0])
+        return  probabilities
+    
+    def coef_(self):
+        return self.w[0]
+        
+    def intercept_(self):
+        return self.b 
+    
+    
     
     
 
