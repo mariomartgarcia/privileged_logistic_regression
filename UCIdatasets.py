@@ -24,8 +24,10 @@ def priv_gain(x, lb, ub):
 
 # %%
 
-text = ['kc2', 'parkinsons', 'breast_cancer', 'obesity', 'wine']
-dc = [bs.kc2(), bs.parkinsons(), bs.breast_cancer(), bs.obesity(), bs.wine()]
+text = ['parkinsons', 'kc2', 'breast_cancer', 'obesity', 'wine']
+dc = [ bs.parkinsons(), bs.kc2(), bs.breast_cancer(), bs.obesity(), bs.wine()]
+
+
 datasets_dict = dict(zip(text, dc))
 
 repetitions = 30  #Number of repetitions for each PI feature
@@ -98,16 +100,19 @@ for te  in text:
     # DEVELOPMENT
 
 
-    acc_lb, mae_lb = [], []
-    acc_ub, mae_ub = [], []
-    acc_realit, mae_realit  = [], []
-    acc_realp, mae_realp = [], []
-    svmup, svmplus, svmb = [], [], []
+
 
     print(te)
 
 
     for p in [0.25, 0.5, 0.75, 1]:
+
+        acc_lb, mae_lb = [], []
+        acc_ub, mae_ub = [], []
+        acc_realit, mae_realit  = [], []
+        acc_realp, mae_realp = [], []
+        svmup, svmplus, svmb = [], [], []
+
         for k in r:
             
             dr = tl.skfold(X, y, cv, r = k)
@@ -124,12 +129,13 @@ for te  in text:
                 SS = MinMaxScaler()
                 X_train = pd.DataFrame(SS.fit_transform(X_train), columns = X_train.columns)
                 X_test = pd.DataFrame(SS.transform(X_test), columns = X_train.columns)
-            
-                X_train = X_train.sample(frac = p, random_state = 2)
-                y_train = y_train[X_train.index]
+                
+                if p<1:
+                    X_train = X_train.sample(frac = p, random_state = 2)
+                    y_train = y_train[X_train.index]
 
-                X_train = X_train.reset_index(drop = True)
-                y_train = y_train.reset_index(drop = True)
+                    X_train = X_train.reset_index(drop = True)
+                    y_train = y_train.reset_index(drop = True)
 
                 #-------------------------------------------
                 #Define the regular space
@@ -239,6 +245,3 @@ for te  in text:
 dataLR.to_csv('dataLR.csv')
 dataSVM.to_csv('dataSVM.csv')
 
-
-# %%
-con
