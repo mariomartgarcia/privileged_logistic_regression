@@ -154,6 +154,7 @@ class LR_plusKL():
         if l < 0:
             raise Exception("l hyperparameter must be 0 or a real positive number")
         self.l = l
+        self.loss = loss
     
     def fit(self, Xc, Xr, omega, beta ):
         
@@ -166,9 +167,9 @@ class LR_plusKL():
         ini = np.ones(self.Xr.shape[1] + 1 )
         
 
-        if loss == 'ts':
+        if self.loss == 'ts':
             result = so.minimize(self.kl_loss_ts, ini, method='L-BFGS-B')
-        if loss == 'st':
+        if self.loss == 'st':
             result = so.minimize(self.kl_loss_st, ini, method='L-BFGS-B')
 
 
@@ -189,7 +190,7 @@ class LR_plusKL():
        y_pred = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.z))])
        y_upper = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.zp)) ])
 
-       d = np.sum(y_upper*np.log((y_upper/y_pred) + 1e-15), axis = 1) + self.l * np.sum(w[0:-1]**2)
+       d = np.sum(np.sum(y_upper*np.log((y_upper/y_pred) + 1e-15), axis = 1)) + self.l * np.sum(w[0:-1]**2)
        return d
     
     def kl_loss_st(self, w):
@@ -197,7 +198,7 @@ class LR_plusKL():
        y_pred = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.z))])
        y_upper = np.array([[1-i,i] for i in np.ravel(self.sigmoid(self.zp)) ])
 
-       d = np.sum(y_pred*np.log((y_pred/y_upper) + 1e-15), axis = 1) + self.l * np.sum(w[0:-1]**2)
+       d = np.sum(np.sum(y_pred*np.log((y_pred/y_upper) + 1e-15), axis = 1)) + self.l * np.sum(w[0:-1]**2)
        return d
     
     

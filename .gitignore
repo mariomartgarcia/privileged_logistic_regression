@@ -6,3 +6,4 @@ data/parkinsons.data
 dataLR.csv
 dataSVM.csv
 data/UCIdataset/
+dataLR_kl.csv

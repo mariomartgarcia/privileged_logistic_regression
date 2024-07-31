@@ -13,6 +13,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.feature_selection import mutual_info_regression, mutual_info_classif
 from sklearn import svm
 import tools as tl
+import time
 
 warnings.filterwarnings("ignore")
 
@@ -30,7 +31,7 @@ dc = [ bs.parkinsons(), bs.kc2(), bs.breast_cancer(), bs.obesity(), bs.wine()]
 
 datasets_dict = dict(zip(text, dc))
 
-repetitions = 1  #Number of repetitions for each PI feature
+repetitions = 30  #Number of repetitions for each PI feature
 cv = 5
 r = random.sample(range(500), repetitions)  #Seed number without replacement
 
@@ -113,6 +114,8 @@ for te  in text:
     acc_realp, mae_realp = [], []
     acc_kl_st = []
     acc_kl_ts = []
+    acc_kt = []
+    train_lrit, train_lrp, train_kl_st, train_kl_ts  = [], [], [], []
     #svmup, svmplus, svmb = [], [], []
 
     for k in r:
@@ -161,15 +164,26 @@ for te  in text:
             #-------------------------------------------
             #LRIT+ model
             al = lr.LRIT_plus()
+
+            start_time = time.time()
             al.fit(X_train, X_trainr,  omega, beta)
+            end_time = time.time()
+            train_lrit.append(end_time - start_time)
+
             test = al.predict(X_testr)
+
             
             acc_realit.append(accuracy_score(y_test, test))
             
             #-------------------------------------------
             #LR+ model
             alp = lr.LR_plus()
+
+            start_time = time.time()
             alp.fit(X_train, X_trainr,  omega, beta)
+            end_time = time.time()
+            train_lrp.append(end_time - start_time)
+
             testp = alp.predict(X_testr)
             
             acc_realp.append(accuracy_score(y_test, testp))
@@ -178,7 +192,11 @@ for te  in text:
             #-------------------------------------------
             #LR_KL model ST
             kl_st = lr.LR_plusKL(loss = 'st')
+            start_time = time.time()
             kl_st.fit(X_train, X_trainr,  omega, beta)
+            end_time = time.time()
+            train_kl_st.append(end_time - start_time)
+
             test_st = kl_st.predict(X_testr)
             
             acc_kl_st.append(accuracy_score(y_test, test_st))
@@ -186,11 +204,40 @@ for te  in text:
 
             #-------------------------------------------
             #LR_KL model ST
+
             kl_ts = lr.LR_plusKL(loss = 'ts')
+            start_time = time.time()
             kl_ts.fit(X_train, X_trainr,  omega, beta)
+            end_time = time.time()
+            train_kl_ts.append(end_time - start_time)
+
+
+
             test_ts = kl_ts.predict(X_testr)
             
             acc_kl_ts.append(accuracy_score(y_test, test_ts))
+
+            #-------------------------------------
+            #KNOWLEDGE TRANSFER
+            lin = {}
+            for i in pi_var:
+                lin[i] = LinearRegression()
+                lin[i].fit(X_trainr, X_train[i])
+
+            kt_train = pd.DataFrame([])
+            kt_test = pd.DataFrame([])
+            for i in pi_var:
+                privil = lin[i].predict(X_trainr)
+                kt_train[i] = privil
+                privil_t = lin[i].predict(X_testr)
+                kt_test[i] = privil_t
+            X_trainr = pd.concat([X_trainr, kt_train], axis = 1)
+            X_testr = pd.concat([X_testr, kt_test], axis = 1)
+
+            kt = LogisticRegression()
+            kt.fit(X_trainr, y_train)
+            pre_kt = kt.predict(X_testr)
+            acc_kt.append(accuracy_score(y_test, pre_kt))
 
 
             
@@ -198,6 +245,8 @@ for te  in text:
     gan_p = priv_gain(np.mean(acc_realp), np.mean(acc_lb), np.mean(acc_ub))
     gan_kl_st = priv_gain(np.mean(acc_kl_st), np.mean(acc_lb), np.mean(acc_ub))
     gan_kl_ts = priv_gain(np.mean(acc_kl_ts), np.mean(acc_lb), np.mean(acc_ub))
+    gan_kt = priv_gain(np.mean(acc_kt), np.mean(acc_lb), np.mean(acc_ub))
+
 
     data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
                         'dataset': te,
@@ -206,18 +255,24 @@ for te  in text:
                         'ACCreal_p':   np.round(np.mean(acc_realp), 3),
                         'ACC_kl_st':  np.round(np.mean(acc_kl_st), 3),
                         'ACC_kl_ts':   np.round(np.mean(acc_kl_ts), 3),
+                        'ACC_kt':      np.round(np.mean(acc_kt), 3),
                         'ACCub':       np.round(np.mean(acc_ub), 3),
                         'stdlb':       np.round(np.std(acc_lb), 3),
                         'stdreal_it':  np.round(np.std(acc_realit), 3),
                         'stdreal_p':   np.round(np.std(acc_realp), 3),
                         'std_kl_st':   np.round(np.std(acc_kl_st), 3),
                         'std_kl_ts':   np.round(np.std(acc_kl_ts), 3),
+                        'std_KT':      np.round(np.std(acc_kt), 3),
                         'stdub':       np.round(np.std(acc_ub), 3),                    
                         'gain_it':      np.round(gan_it, 3),
                         'gain_p':       np.round(gan_p, 3),
                         'gain_kl_st':      np.round(gan_kl_st, 3),
                         'gain_kl_ts':       np.round(gan_kl_ts, 3),
-
+                        'gain_kt':       np.round(gan_kt, 3),
+                        'time_lrit':      np.round(np.mean(train_lrit),3),
+                        'time_lrp':    np.round(np.mean(train_lrp), 3),
+                        'time_kl_st':    np.round(np.mean(train_kl_st),3),
+                        'time_kl_ts':    np.round(np.mean(train_kl_ts), 3)
                         }, index = [0])
 
     dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
@@ -227,4 +282,3 @@ for te  in text:
 dataLR.to_csv('dataLR_kl.csv')
 
 
-# %%
