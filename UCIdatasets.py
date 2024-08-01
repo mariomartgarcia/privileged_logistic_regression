@@ -28,7 +28,6 @@ def priv_gain(x, lb, ub):
 text = ['parkinsons', 'kc2', 'breast_cancer', 'obesity', 'wine']
 dc = [ bs.parkinsons(), bs.kc2(), bs.breast_cancer(), bs.obesity(), bs.wine()]
 
-
 datasets_dict = dict(zip(text, dc))
 
 repetitions = 30  #Number of repetitions for each PI feature
@@ -102,25 +101,26 @@ for te  in text:
 
 
 
-
     print(te)
 
 
 
 
-    acc_lb, mae_lb = [], []
-    acc_ub, mae_ub = [], []
-    acc_realit, mae_realit  = [], []
-    acc_realp, mae_realp = [], []
-    acc_kl_st = []
-    acc_kl_ts = []
-    acc_kt = []
+    Tacc_lb, Tacc_ub, Tacc_realit, Tacc_realp = [], [], [], []
+    Tacc_kl_st = []
+    Tacc_kl_ts = []
+    Tacc_kt = []
     train_lrit, train_lrp, train_kl_st, train_kl_ts  = [], [], [], []
     #svmup, svmplus, svmb = [], [], []
 
     for k in r:
         
         dr = tl.skfold(X, y, cv, r = k)
+
+        acc_lb, acc_ub, acc_realit, acc_realp = [], [], [], []
+        acc_kl_st = []
+        acc_kl_ts = []
+        acc_kt = []
 
         for h in range(cv):
             X_train = dr['X_train' + str(h)]
@@ -239,31 +239,42 @@ for te  in text:
             pre_kt = kt.predict(X_testr)
             acc_kt.append(accuracy_score(y_test, pre_kt))
 
+        Tacc_lb.append(np.mean(acc_lb))
+        Tacc_realit.append(np.mean(acc_realit))
+        Tacc_realp.append(np.mean(acc_realp))
+        Tacc_ub.append(np.mean(acc_ub))
+        Tacc_kl_st.append(np.mean(acc_kl_st))
+        Tacc_kl_ts.append(np.mean(acc_kl_ts))
+        Tacc_kt.append(np.mean(acc_kt))
+
+
+
+
 
             
-    gan_it = priv_gain(np.mean(acc_realit), np.mean(acc_lb), np.mean(acc_ub))
-    gan_p = priv_gain(np.mean(acc_realp), np.mean(acc_lb), np.mean(acc_ub))
-    gan_kl_st = priv_gain(np.mean(acc_kl_st), np.mean(acc_lb), np.mean(acc_ub))
-    gan_kl_ts = priv_gain(np.mean(acc_kl_ts), np.mean(acc_lb), np.mean(acc_ub))
-    gan_kt = priv_gain(np.mean(acc_kt), np.mean(acc_lb), np.mean(acc_ub))
+    gan_it = priv_gain(np.mean(Tacc_realit), np.mean(Tacc_lb), np.mean(Tacc_ub))
+    gan_p = priv_gain(np.mean(Tacc_realp), np.mean(Tacc_lb), np.mean(Tacc_ub))
+    gan_kl_st = priv_gain(np.mean(Tacc_kl_st), np.mean(Tacc_lb), np.mean(Tacc_ub))
+    gan_kl_ts = priv_gain(np.mean(Tacc_kl_ts), np.mean(Tacc_lb), np.mean(Tacc_ub))
+    gan_kt = priv_gain(np.mean(Tacc_kt), np.mean(Tacc_lb), np.mean(Tacc_ub))
 
 
     data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
                         'dataset': te,
-                        'ACClb':       np.round(np.mean(acc_lb), 3),
-                        'ACCreal_it':  np.round(np.mean(acc_realit), 3),
-                        'ACCreal_p':   np.round(np.mean(acc_realp), 3),
-                        'ACC_kl_st':  np.round(np.mean(acc_kl_st), 3),
-                        'ACC_kl_ts':   np.round(np.mean(acc_kl_ts), 3),
-                        'ACC_kt':      np.round(np.mean(acc_kt), 3),
-                        'ACCub':       np.round(np.mean(acc_ub), 3),
-                        'stdlb':       np.round(np.std(acc_lb), 3),
-                        'stdreal_it':  np.round(np.std(acc_realit), 3),
-                        'stdreal_p':   np.round(np.std(acc_realp), 3),
-                        'std_kl_st':   np.round(np.std(acc_kl_st), 3),
-                        'std_kl_ts':   np.round(np.std(acc_kl_ts), 3),
-                        'std_KT':      np.round(np.std(acc_kt), 3),
-                        'stdub':       np.round(np.std(acc_ub), 3),                    
+                        'ACClb':       np.round(np.mean(Tacc_lb), 3),
+                        'ACCreal_it':  np.round(np.mean(Tacc_realit), 3),
+                        'ACCreal_p':   np.round(np.mean(Tacc_realp), 3),
+                        'ACC_kl_st':  np.round(np.mean(Tacc_kl_st), 3),
+                        'ACC_kl_ts':   np.round(np.mean(Tacc_kl_ts), 3),
+                        'ACC_kt':      np.round(np.mean(Tacc_kt), 3),
+                        'ACCub':       np.round(np.mean(Tacc_ub), 3),
+                        'stdlb':       np.round(np.std(Tacc_lb), 3),
+                        'stdreal_it':  np.round(np.std(Tacc_realit), 3),
+                        'stdreal_p':   np.round(np.std(Tacc_realp), 3),
+                        'std_kl_st':   np.round(np.std(Tacc_kl_st), 3),
+                        'std_kl_ts':   np.round(np.std(Tacc_kl_ts), 3),
+                        'std_KT':      np.round(np.std(Tacc_kt), 3),
+                        'stdub':       np.round(np.std(Tacc_ub), 3),                    
                         'gain_it':      np.round(gan_it, 3),
                         'gain_p':       np.round(gan_p, 3),
                         'gain_kl_st':      np.round(gan_kl_st, 3),
@@ -272,13 +283,19 @@ for te  in text:
                         'time_lrit':      np.round(np.mean(train_lrit),3),
                         'time_lrp':    np.round(np.mean(train_lrp), 3),
                         'time_kl_st':    np.round(np.mean(train_kl_st),3),
-                        'time_kl_ts':    np.round(np.mean(train_kl_ts), 3)
+                        'time_kl_ts':    np.round(np.mean(train_kl_ts), 3),
+                        'std_time_lrit':      np.round(np.std(train_lrit),3),
+                        'std_time_lrp':    np.round(np.std(train_lrp), 3),
+                        'std_time_kl_st':    np.round(np.std(train_kl_st),3),
+                        'std_time_kl_ts':    np.round(np.std(train_kl_ts), 3)
                         }, index = [0])
 
     dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
 
 
 
-dataLR.to_csv('dataLR_kl.csv')
+dataLR.to_csv('dataLR_kl1.csv')
 
 
+
+# %%
