@@ -73,42 +73,96 @@ log_coef = pd.DataFrame({'names': names , 'value': values })
 
 # %%
 
+
+text = ['breast_cancer', 'obesity', 'wine', 'drugs', 'spam', 'heart_f', 'heart', 'wm', 'abalone', 'kc2', 'parkinsons']
+dc = [ bs.breast_cancer(), bs.obesity(), bs.wine(), bs.drugs(), bs.spam(), bs.heart_f(), bs.heart(), bs.wm(), bs.abalone(), bs.kc2(), bs.parkinsons()]
+
+
+datasets_dict = dict(zip(text, dc))
+
+repetitions = 30  #Number of repetitions for each PI feature
+cv = 5
+r = random.sample(range(500), repetitions)  #Seed number without replacement
+
+dataLR = pd.DataFrame([])
+
+
+for te  in text:
+
+    if te == 'kc2':
+        X, y, pi_features = datasets_dict[te]
+        y = pd.Series(y)  
+        pi_var = pi_features
+    
+    if te == 'parkinsons':
+        X, y = datasets_dict[te]  
+
+        col = X.columns
+        scaler = MinMaxScaler()
+        Xnorm = scaler.fit_transform(X)
+        Xn = pd.DataFrame(Xnorm, columns = col)
+
+        mi = mutual_info_classif(Xn, y)
+        mi_df = pd.DataFrame({'name': list(Xn.columns), 'mi': mi })
+        mi_sort = mi_df.sort_values(by='mi', ascending=False)
+        pi_var = list(mi_sort['name'][0:10])
+
+    if te in ['breast_cancer', 'obesity', 'wine', 'drugs', 'spam', 'heart_f', 'heart', 'wm', 'abalone', 'kc2', 'parkinsons']:
+        X, y = datasets_dict[te]
+        X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
+        X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
+                    'citric acid': 'cit. acid.', 'residual sugar': 'res. sug.', 
+                    'free sulfur dioxide': 'free sulf diox.', 
+                    'total sulfur dioxide': 'tot. sulf diox'}, inplace = True)
+        X.rename(columns = {'mean radius': 'avg. rad.', 'mean texture': 'avg. tex.', 'mean perimeter': 'avg. per.', 'mean area': 'avg. ar.',
+                    'mean smoothness': 'avg. smo.', 'mean compactness': 'avg. comp.', 'mean concavity': 'avg. conc.',
+                    'mean concave points': 'avg. conc. p.', 'mean symmetry': 'avg. sym.', 'mean fractal dimension': 'avg. frac. dim.',
+                    'radius error': 'rad. er.', 'texture error': 'tex. er.', 'perimeter error': 'per. er.', 'area error': 'ar. er.',
+                    'smoothness error': 'smo. er.', 'compactness error': 'comp. er.', 'concavity error': 'conc. er.',
+                    'concave points error': 'conc. p. er.', 'symmetry error': 'sym. er.', 'fractal dimension error': 'frac. dim. er.',
+                    'worst radius': 'wor. rad.', 'worst texture': 'wor. tex.', 'worst perimeter': 'wor. per.', 'worst area': 'wor. ar.',
+                    'worst smoothness': 'wor. smo.', 'worst compactness': 'wor. comp.', 'worst concavity': 'wor. conc.',
+                    'worst concave points': 'wor. conc. p.', 'worst symmetry': 'wor. sym.', 'worst fractal dimension': 'wor. frac. dim.'}, inplace = True)
+
+        #=============================================================
+        # UNREAL PRIVILEGED CLASSIFIER. LIST OF PI CANDIDATES
+        #=============================================================
+        col = X.columns
+        scaler = MinMaxScaler()
+        Xnorm = scaler.fit_transform(X)
+        Xn = pd.DataFrame(Xnorm, columns = col)
+
+        lg = LogisticRegression()    
+        lg.fit(Xn, y)
+        coef = pd.DataFrame({'names': X.columns, 'coef': lg.coef_[0]})
+        values = np.abs(coef.coef).sort_values(ascending = False)
+        names = list(coef.names[values.index])
+        log_coef = pd.DataFrame({'names': names , 'value': values })
+        pi_var =  [names[0]]
+
+
+
+
+
 #===============================================================
 # N TIME. 5-CV. INCREASING THE NUMBER OF PI FEATURES. MAIN CODE
 #===============================================================
 # DEVELOPMENT
 
 
-number_pi = 2    #Up to 4 privileged features
-repetitions = 30  #Number of repetitions for each PI feature
 
+    print(te)
 
-r = random.sample(range(500), repetitions)  #Seed number without replacement
-q = {}
+ 
+    Tacc_lb, Tacc_ub, Tacc_realp = [], [], []
 
-#Results boxes for every seed
-TACClb, TACCub, TACCreal_it, TACCreal_p = [], [], [], []
-Tstdlb, Tstdub, Tstdreal_it, Tstdreal_p  = [], [], [], []
-Tmedias = []
-
-for i in range(1, number_pi):
-    
-    #Results boxes for every seed
-    ACClb, ACCub, ACCreal_it, ACCreal_p = [], [], [], []
-    medias_p = []
-    
-    print(i)
-    print('-----')
     for k in r:
-        print(k)
-        cv = 5
+        
         dr = tl.skfold(X, y, cv, r = k)
-    
-        acc_lb, mae_lb = [], []
-        acc_ub, mae_ub = [], []
-        acc_realit, mae_realit  = [], []
-        acc_realp, mae_realp = [], []
-        medias = []
+
+        acc_lb, acc_ub, acc_realp = [], [], []
+        medias, medias_p, medias_n= [], [], []
+
         
         for h in range(cv):
             X_train = dr['X_train' + str(h)]
@@ -123,11 +177,6 @@ for i in range(1, number_pi):
             X_train = pd.DataFrame(SS.fit_transform(X_train), columns = X_train.columns)
             X_test = pd.DataFrame(SS.transform(X_test), columns = X_train.columns)
 
-            #----------------------
-            pi_var =  names[0:i]
-            #pi_var = ['dias_hospi']
-            #----------------------
-            
             #-------------------------------------------
             #Define the regular space
             X_trainr = X_train.drop(pi_var, axis = 1)
@@ -145,7 +194,13 @@ for i in range(1, number_pi):
             
             medias.append(np.mean([proba[i][1] if pre[i] == 1 else proba[i][0] for i in range(len(pre))]))
             
-            
+
+            delta = (pre == y_test)
+            medias_p.append(np.mean([np.max(proba[i]) for i in range(len(proba)) if delta[i] == True ]))
+            medias_n.append(np.mean([np.max(proba[i]) for i in range(len(proba)) if delta[i] == False ]))
+
+
+
             acc_ub.append(accuracy_score(y_test, pre))
             
             #-------------------------------------------
@@ -155,14 +210,6 @@ for i in range(1, number_pi):
             prep = lg.predict(X_testr)
     
             acc_lb.append(accuracy_score(y_test, prep))
-
-            #-------------------------------------------
-            #LRIT+ model
-            al = lr.LRIT_plus()
-            al.fit(X_train, X_trainr,  omega, beta)
-            test = al.predict(X_testr)
-            
-            acc_realit.append(accuracy_score(y_test, test))
             
             #-------------------------------------------
             #LR+ model
@@ -173,58 +220,24 @@ for i in range(1, number_pi):
             acc_realp.append(accuracy_score(y_test, testp))
 
         
-        #Computation od the mean for the 5 folds
-        
-        #Base and Unreal Privileged model
-        ACClb.append(np.mean(acc_lb))
-        ACCub.append(np.mean(acc_ub))
-        
-        medias_p.append(np.mean(medias))
+        Tacc_lb.append(np.mean(acc_lb))
+        Tacc_realp.append(np.mean(acc_realp))
+        Tacc_ub.append(np.mean(acc_ub))
 
-        #LRIT+
-        ACCreal_it.append(np.mean(acc_realit))
-
-        #LR+
-        ACCreal_p.append(np.mean(acc_realp))
-
-    #Computation od the mean for the N iterations
-    
-    q['lower' + str(i)] = ACClb
-    q['upper' + str(i)] = ACCub
-    q['real_it' + str(i)] = ACCreal_it
-    q['real_p' + str(i)] = ACCreal_p
-     
-    #Base and Unreal Privileged model
-    TACClb.append(np.mean(ACClb))
-    Tstdlb.append(np.std(ACClb))
-    TACCub.append(np.mean(ACCub))
-    Tstdub.append(np.std(ACCub))
-    
-    Tmedias.append(np.mean(medias_p))
+        gan_p = priv_gain(np.mean(Tacc_realp), np.mean(Tacc_lb), np.mean(Tacc_ub))
 
 
-    #LRIT+
-    TACCreal_it.append(np.mean(ACCreal_it))
-    Tstdreal_it.append(np.std(ACCreal_it))
-    
-    #LR+
-    TACCreal_p.append(np.mean(ACCreal_p))
-    Tstdreal_p.append(np.std(ACCreal_p))
-# %%
-print(Tmedias)
+
+        data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
+                    'dataset': te,
+                    'ACClb':       np.round(np.mean(Tacc_lb), 3),
+                    'ACCreal_p':   np.round(np.mean(Tacc_realp), 3),
+                    'ACCub':       np.round(np.mean(Tacc_ub), 3),
+                    'MPP':       np.round(np.mean(medias), 3),
+                    'MPP_correct':       np.round(np.mean(medias_p), 3),
+                    'MPP_errors':       np.round(np.mean(medias_n), 3),
+                    'gain_p':       np.round(gan_p, 3),
+                    }, index = [0])
+        dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
 
 
-def priv_gain(x, lb, ub):
-    pg = ( (np.array(x) - np.array(lb)) / (np.array(ub) - np.array(lb)) )*100
-    return pg
-
-gan_it = priv_gain(TACCreal_it[0], TACClb[0], TACCub[0])
-gan_p = priv_gain(TACCreal_p[0], TACClb[0], TACCub[0])
-
-print('LRUP', np.round(TACCub[0],3), '+-', np.round(Tstdub[0],3))
-print('LRIT+', np.round(TACCreal_it[0],4), '+-', np.round(Tstdreal_it[0],3))
-print('LR+', np.round(TACCreal_p[0],4), '+-', np.round(Tstdreal_p[0],3))
-print('LRB', np.round(TACClb[0],3), '+-', np.round(Tstdlb[0],3))
-
-print('Ganancia LR+', np.round(gan_p,1))#, '+-', np.round(std_p,1))
-print('Ganancia LRIT+', np.round(gan_it,1))#, '+-', np.round(std_it,1))
