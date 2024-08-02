@@ -1,7 +1,8 @@
+# %%
 import pandas as pd
 import numpy as np
 import warnings
-from sklearn.metrics import  accuracy_score, brier_score_loss
+from sklearn.metrics import  accuracy_score 
 from sklearn.linear_model import LogisticRegression
 import lrplus as lr
 import load_UCIdatasets as bs
@@ -11,72 +12,17 @@ import random
 from scipy import stats
 import tools as tl
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.feature_selection import mutual_info_regression, mutual_info_classif
 
 warnings.filterwarnings("ignore")
 
+def priv_gain(x, lb, ub):
+    pg = ( (np.array(x) - np.array(lb)) / (np.array(ub) - np.array(lb)) )*100
+    return pg
 
 # %%
-
-#===================================
-# DATASETS (select what you want)
-#===================================
-
-#X, y = bs.breast_cancer()
-#X, y = bs.obesity()
-#X, y = bs.wine()
-
-
-
-#X, y = bs.drugs()
-X, y = bs.spam()
-#X, y = bs.heart()
-#X, y = bs.wm()
-#X, y = bs.heart()
-#X, y = bs.abalone()
-#X, y = bs.car()
-
-X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
-X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
-                    'citric acid': 'cit. acid.', 'residual sugar': 'res. sug.', 
-                    'free sulfur dioxide': 'free sulf diox.', 
-                    'total sulfur dioxide': 'tot. sulf diox'}, inplace = True)
-X.rename(columns = {'mean radius': 'avg. rad.', 'mean texture': 'avg. tex.', 'mean perimeter': 'avg. per.', 'mean area': 'avg. ar.',
-       'mean smoothness': 'avg. smo.', 'mean compactness': 'avg. comp.', 'mean concavity': 'avg. conc.',
-       'mean concave points': 'avg. conc. p.', 'mean symmetry': 'avg. sym.', 'mean fractal dimension': 'avg. frac. dim.',
-       'radius error': 'rad. er.', 'texture error': 'tex. er.', 'perimeter error': 'per. er.', 'area error': 'ar. er.',
-       'smoothness error': 'smo. er.', 'compactness error': 'comp. er.', 'concavity error': 'conc. er.',
-       'concave points error': 'conc. p. er.', 'symmetry error': 'sym. er.', 'fractal dimension error': 'frac. dim. er.',
-       'worst radius': 'wor. rad.', 'worst texture': 'wor. tex.', 'worst perimeter': 'wor. per.', 'worst area': 'wor. ar.',
-       'worst smoothness': 'wor. smo.', 'worst compactness': 'wor. comp.', 'worst concavity': 'wor. conc.',
-       'worst concave points': 'wor. conc. p.', 'worst symmetry': 'wor. sym.', 'worst fractal dimension': 'wor. frac. dim.'}, inplace = True)
-
-
-
-
-#=============================================================
-# UNREAL PRIVILEGED CLASSIFIER. LIST OF PI CANDIDATES
-#=============================================================
-
-
-
-col = X.columns
-scaler = MinMaxScaler()
-Xnorm = scaler.fit_transform(X)
-Xn = pd.DataFrame(Xnorm, columns = col)
-    
-lg = LogisticRegression()    
-lg.fit(Xn, y)
-coef = pd.DataFrame({'names': X.columns, 'coef': lg.coef_[0]})
-values = np.abs(coef.coef).sort_values(ascending = False)
-names = list(coef.names[values.index])
-log_coef = pd.DataFrame({'names': names , 'value': values })
-
-# %%
-
-
 text = ['breast_cancer', 'obesity', 'wine', 'drugs', 'spam', 'heart_f', 'heart', 'wm', 'abalone', 'kc2', 'parkinsons']
 dc = [ bs.breast_cancer(), bs.obesity(), bs.wine(), bs.drugs(), bs.spam(), bs.heart_f(), bs.heart(), bs.wm(), bs.abalone(), bs.kc2(), bs.parkinsons()]
-
 
 datasets_dict = dict(zip(text, dc))
 
@@ -107,7 +53,7 @@ for te  in text:
         mi_sort = mi_df.sort_values(by='mi', ascending=False)
         pi_var = list(mi_sort['name'][0:10])
 
-    if te in ['breast_cancer', 'obesity', 'wine', 'drugs', 'spam', 'heart_f', 'heart', 'wm', 'abalone', 'kc2', 'parkinsons']:
+    if te in ['breast_cancer', 'obesity', 'wine', 'drugs', 'spam', 'heart_f', 'heart', 'wm', 'abalone']:
         X, y = datasets_dict[te]
         X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
         X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
@@ -239,5 +185,7 @@ for te  in text:
                     'gain_p':       np.round(gan_p, 3),
                     }, index = [0])
         dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
+
+dataLR.to_csv('discussion.csv')
 
 
