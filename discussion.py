@@ -172,7 +172,7 @@ for te  in text:
 
 
 
-        data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
+    data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
                     'dataset': te,
                     'ACClb':       np.round(np.mean(Tacc_lb), 3),
                     'ACCreal_p':   np.round(np.mean(Tacc_realp), 3),
@@ -182,7 +182,7 @@ for te  in text:
                     'MPP_errors':       np.round(np.mean(medias_n), 3),
                     'gain_p':       np.round(gan_p, 3),
                     }, index = [0])
-        dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
+    dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
 
 dataLR.to_csv('discussion.csv')
 
