@@ -6,7 +6,6 @@ from sklearn.datasets import  load_breast_cancer
 from sklearn.model_selection import StratifiedKFold
 from sklearn.impute import KNNImputer
 import tools as tl
-from ucimlrepo import fetch_ucirepo 
 warnings.filterwarnings("ignore")
 
 #=========================================================================================================
@@ -329,7 +328,7 @@ def car():
 
 #Kc2
 def kc2():
-    dfs = pd.read_csv(r'/Users/mmartinez/Desktop/KnowledgeDistillation/data/PI/kc2.csv')
+    dfs = pd.read_csv('data/kc2.csv')
     dfs['problems'] = (dfs['problems'] == 'yes')*1
     X = dfs.drop('problems', axis = 1)
     y = dfs['problems']
@@ -340,7 +339,7 @@ def kc2():
 
 #Parkinsons
 def parkinsons():
-    df = pd.read_csv(r'/Users/mmartinez/Desktop/KnowledgeDistillation/data/PI/parkinsons/parkinsons.data')
+    df = pd.read_csv('data/parkinsons.data')
     X = df.drop(['name', 'status'], axis = 1)
     y = df['status']
     y = 2*y-1

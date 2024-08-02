@@ -6,8 +6,6 @@ from sklearn.metrics import  accuracy_score
 from sklearn.linear_model import LogisticRegression
 import lrplus as lr
 import load_UCIdatasets as bs
-import matplotlib.pyplot as plt
-import seaborn as sns
 import random
 from scipy import stats
 import tools as tl
