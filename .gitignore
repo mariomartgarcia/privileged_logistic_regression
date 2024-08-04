@@ -7,3 +7,8 @@ dataLR.csv
 dataSVM.csv
 data/UCIdataset/
 dataLR_kl.csv
+UCIdatasets_aw.py
+dataLR1.csv
+dataLR_kl1.csv
+dataSVM1.csv
+dataSVMmm.csv
