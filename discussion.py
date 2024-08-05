@@ -106,6 +106,7 @@ for te  in text:
 
         acc_lb, acc_ub, acc_realp = [], [], []
         medias, medias_p, medias_n= [], [], []
+        dif_medias = []
 
         
         for h in range(cv):
@@ -142,6 +143,7 @@ for te  in text:
             delta = (pre == y_test)
             medias_p.append(np.mean([np.max(proba[i]) for i in range(len(proba)) if delta[i] == True ]))
             medias_n.append(np.mean([np.max(proba[i]) for i in range(len(proba)) if delta[i] == False ]))
+            dif_medias.append(np.mean([np.max(proba[i]) for i in range(len(proba)) if delta[i] == True ]) - np.mean([np.max(proba[i]) for i in range(len(proba)) if delta[i] == False ]))
 
 
 
@@ -182,8 +184,9 @@ for te  in text:
                     'std_correct':       np.round(np.std(medias_p), 3),
                     'MPP_errors':       np.round(np.mean(medias_n), 3),
                     'std_errors':       np.round(np.std(medias_n), 3),
-                    'gain_p':       np.round(gan_p, 3),
-                    }, index = [0])
+                    'DifMPP':         np.round(np.mean(dif_medias), 3),
+                    'stdMPP':         np.round(np.std(dif_medias), 3),
+                    'gain_p':       np.round(gan_p, 3)}, index = [0])
     dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
 
 dataLR.to_csv('discussion.csv')
