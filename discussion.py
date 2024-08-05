@@ -179,7 +179,9 @@ for te  in text:
                     'ACCub':       np.round(np.mean(Tacc_ub), 3),
                     'MPP':       np.round(np.mean(medias), 3),
                     'MPP_correct':       np.round(np.mean(medias_p), 3),
+                    'std_correct':       np.round(np.std(medias_p), 3),
                     'MPP_errors':       np.round(np.mean(medias_n), 3),
+                    'std_errors':       np.round(np.std(medias_n), 3),
                     'gain_p':       np.round(gan_p, 3),
                     }, index = [0])
     dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
@@ -187,3 +189,5 @@ for te  in text:
 dataLR.to_csv('discussion.csv')
 
 
+
+# %%
