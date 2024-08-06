@@ -1,12 +1,12 @@
+
+# %%
+
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.metrics import  accuracy_score
 from sklearn.linear_model import LogisticRegression
 import lrplus as lr
 import tools as tl
-import matplotlib.pyplot as plt
-import seaborn as sns
 import random
 from sklearn import svm
 from sklearn.preprocessing import MinMaxScaler
@@ -86,7 +86,7 @@ def mackey_glass(n, T, tau = 17):
 
 for j in [3, 5, 8]:
     T = j
-    repetitions = 2  #Number of repetitions for each PI feature
+    repetitions = 30  #Number of repetitions for each PI feature
     r = random.sample(range(500), repetitions)  #Seed number without replacement
     
     #Results boxes for every seed
@@ -103,17 +103,19 @@ for j in [3, 5, 8]:
         
         
         #Results boxes for every seed
-        ACClb, ACCub, ACCreal_it, ACCreal_p = [], [], [], []
-        ACCsvmup, ACCsvmplus, ACCsvmplusq, ACCsvmb = [], [], [], []
+ 
+
+        acc_lb, mae_lb = [], []
+        acc_ub, mae_ub = [], []
+        acc_realit, acc_realp  = [], []
+        svmup, svmplus, svmb = [], [], []
+
         print(i)
         for k in r:
             cv = 5
             dr = tl.skfold(X, y, cv, r = k)
         
-            acc_lb, mae_lb = [], []
-            acc_ub, mae_ub = [], []
-            acc_realit, acc_realp  = [], []
-            svmup, svmplus, svmb = [], [], []
+
             
             
             for h in range(cv):
@@ -199,52 +201,33 @@ for j in [3, 5, 8]:
                 svmb.append(accuracy_score(y_test, test_sb))
        
                 
-                
-            
-            #Computation od the mean for the 5 folds
-            
-            #Base and Unreal Privileged model
-            ACClb.append(np.mean(acc_lb))
-            ACCub.append(np.mean(acc_ub))
-            
-    
-            #LRIT+
-            ACCreal_it.append(np.mean(acc_realit))
-    
-            #LR+
-            ACCreal_p.append(np.mean(acc_realp))
-            
-            #SVM
-            ACCsvmup.append(np.mean(svmup))
-            ACCsvmplus.append(np.mean(svmplus))
-            ACCsvmb.append(np.mean(svmb))
-    
+        
          
         #Base and Unreal Privileged model
-        TACClb.append(np.mean(ACClb))
-        Tstdlb.append(np.std(ACClb))
-        TACCub.append(np.mean(ACCub))
-        Tstdub.append(np.std(ACCub))
+        TACClb.append(np.mean(acc_lb))
+        Tstdlb.append(np.std(acc_lb))
+        TACCub.append(np.mean(acc_ub))
+        Tstdub.append(np.std(acc_ub))
         
     
     
         #LRIT+
-        TACCreal_it.append(np.mean(ACCreal_it))
-        Tstdreal_it.append(np.std(ACCreal_it))
+        TACCreal_it.append(np.mean(acc_realit))
+        Tstdreal_it.append(np.std(acc_realit))
         
         #LR+
-        TACCreal_p.append(np.mean(ACCreal_p))
-        Tstdreal_p.append(np.std(ACCreal_p))
+        TACCreal_p.append(np.mean(acc_realp))
+        Tstdreal_p.append(np.std(acc_realp))
         
         
         #SVM
-        TACCsvmup.append(np.mean(ACCsvmup))
-        TACCsvmplus.append(np.mean(ACCsvmplus))
-        TACCsvmb.append(np.mean(ACCsvmb))
+        TACCsvmup.append(np.mean(svmup))
+        TACCsvmplus.append(np.mean(svmplus))
+        TACCsvmb.append(np.mean(svmb))
         
-        Tstdsvmup.append(np.std(ACCsvmup))
-        Tstdsvmplus.append(np.std(ACCsvmplus))
-        Tstdsvmb.append(np.std(ACCsvmb))
+        Tstdsvmup.append(np.std(svmup))
+        Tstdsvmplus.append(np.std(svmplus))
+        Tstdsvmb.append(np.std(svmb))
 
 
     
@@ -254,37 +237,39 @@ for j in [3, 5, 8]:
     
     
     
-    data_lr = pd.DataFrame({'size': [500, 1000, 1500],
-                           'TACCub': TACCub,
-                           'TACClb': TACClb,
-                           'TACCreal_it':TACCreal_it,
-                           'TACCreal_p': TACCreal_p,
-                           'Tstdlb': Tstdlb,
-                           'Tstdub': Tstdub,
-                           'Tstdreal_p':Tstdreal_p,
-                           'Tstdreal_it': Tstdreal_it,
-                           'gain_it': gan_it,
-                           'gain_p': gan_p,
+    data_lr = pd.DataFrame({
+        'size': [500, 1000, 1500],
+        'TACCub': np.round(TACCub, 3),
+        'TACClb': np.round(TACClb, 3),
+        'TACCreal_it': np.round(TACCreal_it, 3),
+        'TACCreal_p': np.round(TACCreal_p, 3),
+        'Tstdlb': np.round(Tstdlb, 3),
+        'Tstdub': np.round(Tstdub, 3),
+        'Tstdreal_p': np.round(Tstdreal_p, 3),
+        'Tstdreal_it': np.round(Tstdreal_it, 3),
+        'gain_it': np.round(gan_it, 3),
+        'gain_p': np.round(gan_p, 3),
+    })
     
-                           })
-    
-    data_svm = pd.DataFrame({ 'size': [500, 1000, 1500],
-                            'TACCsvmb': TACCsvmb,
-                            'TACCsvmplus': TACCsvmplus,
-                            'TACCsvmup': TACCsvmup,
-                            'Tstdsvmb': Tstdsvmb,
-                            'Tstdsvmplus': Tstdsvmplus,
-                            'Tstdsvmup': Tstdsvmup,
-                           'gain_svm': gan_svm,
-    
-                           })
+    data_svm = pd.DataFrame({
+        'size': [500, 1000, 1500],
+        'TACCsvmb': np.round(TACCsvmb, 3),
+        'TACCsvmplus': np.round(TACCsvmplus, 3),
+        'TACCsvmup': np.round(TACCsvmup, 3),
+        'Tstdsvmb': np.round(Tstdsvmb, 3),
+        'Tstdsvmplus': np.round(Tstdsvmplus, 3),
+        'Tstdsvmup': np.round(Tstdsvmup, 3),
+        'gain_svm': np.round(gan_svm, 3),
+    })
     
     print('LRIT', gan_it)
     print('LR', gan_p)
     print('SVM', gan_svm)
 
     texto = 'T'+str(j)
-    #data_lr.to_csv(r'/Users/mmartinez/Desktop/LR+ Paper/privileged_logistic_regression/code/results/mackeyglass/' + texto + '_LR.csv')
-    #data_svm.to_csv(r'/Users/mmartinez/Desktop/LR+ Paper/privileged_logistic_regression/code/results/mackeyglass/' + texto + '_SVM.csv')
+    data_lr.to_csv('MG_' + texto + '_LR.csv')
+    data_svm.to_csv('MG_' + texto + '_SVM.csv')
 
 
+
+# %%
