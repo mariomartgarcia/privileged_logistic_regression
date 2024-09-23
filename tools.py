@@ -86,3 +86,44 @@ class svmplus_CVX():
     def parameters(self):
         return  self.w, self.b
     
+#=============================================================================
+                        #KNOWLEDGE TRANSFER SVM
+#=============================================================================
+
+class KT_svm():
+    def __init__(self, kernel_ridge = 'linear', kernel_svm = 'linear'):
+        self.kernel_svm = kernel_svm
+        self.kernel_ridge = kernel_ridge
+        
+    def fit(self, X, y, pi_features):  
+        pi_features = [pi_features]
+        Xp = X[pi_features]
+        Xr = X.drop(pi_features, axis = 1)
+        self.m = {}
+        kt = pd.DataFrame([])
+        for i, j in enumerate(pi_features):
+            self.m[j] = KernelRidge(kernel = self.kernel_ridge)
+            self.m[j].fit(Xr, Xp.iloc[:,i])
+            xkt = self.m[j].predict(Xr)
+            kt[j] = xkt
+            
+        Xkt = pd.concat([Xr, kt], axis = 1)
+
+        
+        self.pi_columns = Xp.columns
+        self.model = svm.SVC(kernel =  self.kernel_svm)
+        self.model.fit(Xkt, y)
+        
+        
+        
+    def predict(self, Xr):
+        kt = pd.DataFrame([])
+        for i in range(len(self.m)):
+            col = self.pi_columns[i]
+            xkt = self.m[col].predict(Xr)
+            kt[col] = xkt
+                    
+            
+        Xkt = pd.concat([Xr, kt], axis = 1)
+        pre = self.model.predict(Xkt)
+        return pre, kt
