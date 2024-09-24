@@ -4,3 +4,4 @@ cvxpy
 scipy 
 scikit-learn
 seaborn
+ucimlrepo
