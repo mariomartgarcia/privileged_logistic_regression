@@ -25,19 +25,19 @@ def priv_gain(x, lb, ub):
 
 # %%
 
-text = ['obesity', 'wine', 'breast_cancer']
-dc = [bs.obesity(), bs.wine(), bs.breast_cancer()]
+text = ['phishing', 'diabetes', 'wm']
+dc = [bs.phishing(), bs.diabetes(), bs.wm()]
 
 
 datasets_dict = dict(zip(text, dc))
 
-repetitions = 10  #Number of repetitions for each PI feature
+repetitions = 30  #Number of repetitions for each PI feature
 cv = 5
 r = random.sample(range(500), repetitions)  #Seed number without replacement
 
 dataLR = pd.DataFrame([])
 dataSVM = pd.DataFrame([])
-dataOTHER = pd.DataFrame([])
+number_pi = 5
 
 
 for te  in text:
@@ -60,7 +60,7 @@ for te  in text:
         mi_sort = mi_df.sort_values(by='mi', ascending=False)
         pi_var = list(mi_sort['name'][0:10])
 
-    if te in ['breast_cancer', 'obesity', 'wine']:
+    if te in ['breast_cancer', 'obesity', 'wine', 'phishing', 'diabetes', 'wm']:
         X, y = datasets_dict[te]
         X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
         X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
@@ -91,7 +91,7 @@ for te  in text:
         values = np.abs(coef.coef).sort_values(ascending = False)
         names = list(coef.names[values.index])
         log_coef = pd.DataFrame({'names': names , 'value': values })
-        pi_var =  [names[0]]
+        #pi_var =  [names[0]]
 
             
 
@@ -106,15 +106,15 @@ for te  in text:
     print('XXXXXXX')
     print(te)
 
-    for p in [1]:
+    for p in range(1, number_pi):
         print('----------')
         print(p)
         print('---------')
 
         Tacc_lb, Tacc_ub, Tacc_realit, Tacc_realp = [], [], [], []
         Tsvmup, Tsvmplus, Tsvmb = [], [], []
-        Tplr, Tktsvme, Tgd_e, Tpfd_e = [[] for i in range(4)]
 
+        pi_var = names[0:p]
 
         for k in r:
             
@@ -122,7 +122,6 @@ for te  in text:
 
             acc_lb, acc_ub, acc_realit, acc_realp = [], [], [], []
             svmup, svmplus, svmb = [], [], []
-            plr_m, ktsvme, gd_e, pfd_e = [[] for i in range(4)]
 
             for h in range(cv):
                 X_train = dr['X_train' + str(h)]
@@ -222,37 +221,6 @@ for te  in text:
                 #-------------------------------------------
                 #-------------------------------------------
 
-                #PLR
-                plr = PrivilegedLogisticRegression()
-                plr.fit(X_trainr, y_train, X_star=X_trainp, y_star=y_train)
-                pre = plr.predict(X_testr)
-
-                plr_m.append(accuracy_score(y_test, pre))
-
-                #KTSVM
-                ktsvm = tl.KT_svm()
-                ktsvm.fit(X_train, y_train, pi_var[0])
-                pre = ktsvm.predict(X_testr)
-
-                ktsvme.append(accuracy_score(y_test, pre))
-
-                #GD
-                #gd = tl.GD()
-                #gd.fit(X_trainp, X_trainr, y_train, omega, beta)
-                #pre = gd.predict(X_testr)
-
-                #gd_e.append(accuracy_score(y_test, pre))
-
-
-                #PFD
-                pfd = tl.GD()
-                pfd.fit(X_train, X_trainr, y_train, omega, beta)
-                pre = pfd.predict(X_testr)
-
-                pfd_e.append(accuracy_score(y_test, pre))
-
-
-
 
 
 
@@ -264,10 +232,6 @@ for te  in text:
             Tsvmplus.append(np.mean(svmplus))
             Tsvmup.append(np.mean(svmup))
 
-            Tplr.append(np.mean(plr_m))
-            Tktsvme.append(np.mean(ktsvme))
-            Tgd_e.append(np.mean(gd_e))
-            Tpfd_e.append(np.mean(pfd_e))
 
                 
         gan_it = priv_gain(np.mean(Tacc_realit), np.mean(Tacc_lb), np.mean(Tacc_ub))
@@ -303,21 +267,9 @@ for te  in text:
 
                             }, index = [0])
         
-        data_other = pd.DataFrame({#'nPI': range(1, number_pi),
-                            'dataset': te,
-                            'ACCplr':    np.round(np.mean(Tplr), 3),
-                            'std_plr':    np.round(np.std(Tplr), 3),  
-                            'ACCktsvm':    np.round(np.mean(Tktsvme), 3),
-                            'std_ktsvm':    np.round(np.std(Tktsvme), 3), 
-                             'ACCgd':    np.round(np.mean(Tgd_e), 3),
-                            'std_gd':    np.round(np.std(Tgd_e), 3), 
-                             'ACCpfd':    np.round(np.mean(Tpfd_e), 3),
-                            'std_pfd':    np.round(np.std(Tpfd_e), 3),                    
-                            }, index = [0])
 
         dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
         dataSVM = pd.concat([dataSVM, data_svm]).reset_index(drop = True)
-        dataOTHER = pd.concat([dataOTHER, data_other]).reset_index(drop = True)
 
 
 
