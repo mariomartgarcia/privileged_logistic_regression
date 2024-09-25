@@ -6,7 +6,7 @@ from sklearn.datasets import  load_breast_cancer
 from sklearn.model_selection import StratifiedKFold
 from sklearn.impute import KNNImputer
 import tools as tl
-from ucimlrepo import fetch_ucirepo 
+#from ucimlrepo import fetch_ucirepo 
 warnings.filterwarnings("ignore")
 
 #=========================================================================================================
@@ -55,7 +55,7 @@ def breast_cancer(c = False):
 
 def obesity(c = False):
     
-    df = pd.read_csv(url_obesity, sep = ',')
+    df = pd.read_csv('data/UCIdataset/ObesityDataSet_raw_and_data_sinthetic.csv', sep = ',')
     
     df['Gender'][df['Gender'] == 'Female'] = 0
     df['Gender'][df['Gender'] == 'Male'] = 1
@@ -112,7 +112,7 @@ def obesity(c = False):
 #=============================================================================================
 
 def wine(c = False):
-    df = pd.read_csv(url_wine, sep = ';')
+    df = pd.read_csv('data/UCIdataset/winequality-white.csv', sep = ';')
     df.quality[df.quality<=5] = 0
     df.quality[df.quality>5] = 1
     
