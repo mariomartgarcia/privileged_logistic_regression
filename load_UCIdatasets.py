@@ -347,7 +347,77 @@ def parkinsons():
     return X, y
 
 
+#--------------------------------------------------------
+#1. PHISHING | (1250x9) | Binario
+
+def phishing(from_csv = True):
+    if from_csv:
+        df = pd.read_csv('data/phishing.csv', index_col = False)
+        y = df['0']
+        X = df.drop(['Unnamed: 0', '0'], axis = 1)
+        return X,y
+    else:
+        dataset = Phishing()
+        X = pd.DataFrame()
+        y = []
+        for xx, yy in dataset.take(5000):
+            X = pd.concat([X, pd.DataFrame([xx])], ignore_index=True)
+            y.append(yy)
+        y = pd.Series(y)*1
+        return X, y
 
 
 
+#--------------------------------------------------------
+#2. DIABETES | (768x8) | Binario
+
+def diabetes():
+    df = pd.read_csv('data/diabetes.csv')
+    X = df.drop('Outcome', axis = 1)
+    y = df['Outcome']
+    return X, y
+
+
+#--------------------------------------------------------
+#12. WHITE MATTER | (1904 x 24)  | Binario 
+
+
+def wm():
+    df = pd.read_csv('data/WM_data.csv', sep = ',')
+    
+    df.age5[df.age5 == '20-24'] = 1
+    df.age5[df.age5 == '25-29'] = 2
+    df.age5[df.age5 == '30-34'] = 3
+    df.age5[df.age5 == '35-39'] = 4
+    df.age5[df.age5 == '40-44'] = 5
+    df.age5[df.age5 == '45-49'] = 6
+    df.age5[df.age5 == '50-54'] = 7
+    df.age5[df.age5 == '55-59'] = 8
+    df.age5[df.age5 == '60-64'] = 9
+    df.age5[df.age5 == '65-69'] = 10
+    df.age5[df.age5 == '70-74'] = 11
+    df.age5[df.age5 == '75-79'] = 12
+    df.age5[df.age5 == '80-84'] = 13
+
+    df.age5.astype(int)
+    
+    imp = df.drop('wm', axis = 1)
+    index = []
+    for i in range(imp.shape[1]):
+        if len(imp.iloc[:,i].unique()) < 6:
+            if imp.iloc[:,i].isnull().sum() != 0:
+                index.append(i)
+
+    imputer = KNNImputer(n_neighbors=5)
+    i = imputer.fit_transform(imp)
+    imp_correct = pd.DataFrame(i, columns = imp.columns)
+
+    for i in index:
+        for j in range(imp_correct.shape[0]):
+            imp_correct.iloc[j, i] = round(imp_correct.iloc[j, i])
+            
+    X = imp_correct
+    y = df.wm
+    
+    return X, y
 
