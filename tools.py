@@ -98,7 +98,7 @@ class KT_svm():
         self.kernel_ridge = kernel_ridge
         
     def fit(self, X, y, pi_features):  
-        pi_features = [pi_features]
+        #pi_features = [pi_features]
         Xp = X[pi_features]
         Xr = X.drop(pi_features, axis = 1)
         self.m = {}

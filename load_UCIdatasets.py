@@ -353,7 +353,7 @@ def parkinsons():
 def phishing(from_csv = True):
     if from_csv:
         df = pd.read_csv('data/phishing.csv', index_col = False)
-        y = df['0']
+        y = 2*df['0']-1
         X = df.drop(['Unnamed: 0', '0'], axis = 1)
         return X,y
     else:
@@ -374,7 +374,7 @@ def phishing(from_csv = True):
 def diabetes():
     df = pd.read_csv('data/diabetes.csv')
     X = df.drop('Outcome', axis = 1)
-    y = df['Outcome']
+    y = 2*df['Outcome']-1
     return X, y
 
 
@@ -417,7 +417,7 @@ def wm():
             imp_correct.iloc[j, i] = round(imp_correct.iloc[j, i])
             
     X = imp_correct
-    y = df.wm
+    y = 2*df.wm-1
     
     return X, y
 

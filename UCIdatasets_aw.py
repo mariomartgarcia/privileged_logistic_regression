@@ -25,13 +25,13 @@ def priv_gain(x, lb, ub):
 
 # %%
 
-text = ['obesity', 'wine', 'breast_cancer']
-dc = [bs.obesity(), bs.wine(), bs.breast_cancer()]
+text = ['kc2', 'parkinsons', 'obesity', 'wine', 'breast_cancer', 'phishing', 'diabetes', 'wm']
+dc = [bs.kc2(), bs.parkinsons(), bs.obesity(), bs.wine(), bs.breast_cancer(), bs.phishing(), bs.diabetes(), bs.wm()]
 
 
 datasets_dict = dict(zip(text, dc))
 
-repetitions = 10  #Number of repetitions for each PI feature
+repetitions = 30  #Number of repetitions for each PI feature
 cv = 5
 r = random.sample(range(500), repetitions)  #Seed number without replacement
 
@@ -60,7 +60,7 @@ for te  in text:
         mi_sort = mi_df.sort_values(by='mi', ascending=False)
         pi_var = list(mi_sort['name'][0:10])
 
-    if te in ['breast_cancer', 'obesity', 'wine']:
+    if te in ['breast_cancer', 'obesity', 'wine', 'phishing', 'diabetes', 'wm']:
         X, y = datasets_dict[te]
         X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
         X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
@@ -111,7 +111,7 @@ for te  in text:
         print(p)
         print('---------')
 
-        Tacc_lb, Tacc_ub, Tacc_realit, Tacc_realp = [], [], [], []
+        Tacc_lb, Tacc_ub, Tacc_oub, Tacc_realit, Tacc_realp = [ [] for i in range(5)]
         Tsvmup, Tsvmplus, Tsvmb = [], [], []
         Tplr, Tktsvme, Tgd_e, Tpfd_e = [[] for i in range(4)]
 
@@ -120,7 +120,7 @@ for te  in text:
             
             dr = tl.skfold(X, y, cv, r = k)
 
-            acc_lb, acc_ub, acc_realit, acc_realp = [], [], [], []
+            acc_lb, acc_ub, acc_oub, acc_realit, acc_realp = [ [] for i in range(5)]
             svmup, svmplus, svmb = [], [], []
             plr_m, ktsvme, gd_e, pfd_e = [[] for i in range(4)]
 
@@ -148,9 +148,22 @@ for te  in text:
                 #Define the regular space
                 X_trainr = X_train.drop(pi_var, axis = 1)
                 X_testr = X_test.drop(pi_var, axis = 1)
-                
+                X_trainp = X_train[pi_var]
+                X_testp = X_test[pi_var]
 
                 #-------------------------------------------
+                #Only Privileged model
+                lg = LogisticRegression()    
+                lg.fit(X_trainp, y_train)
+                omega_o = lg.coef_[0]
+                beta_o = lg.intercept_
+                pre = lg.predict(X_testp)
+                proba = lg.predict_proba(X_testp)
+                
+                acc_oub.append(accuracy_score(y_test, pre))
+
+                #------------------------------------------
+
                 #Unreal Privileged model
                 lg = LogisticRegression()    
                 lg.fit(X_train, y_train)
@@ -200,7 +213,7 @@ for te  in text:
 
                 #SVM+ model
                 svmp = tl.svmplus_CVX()
-                X_trainp = X_train[pi_var]
+                
 		
 
                 svmp.fit(X_trainr, X_trainp, y_train)
@@ -222,6 +235,7 @@ for te  in text:
                 #-------------------------------------------
                 #-------------------------------------------
 
+
                 #PLR
                 plr = PrivilegedLogisticRegression()
                 plr.fit(X_trainr, y_train, X_star=X_trainp, y_star=y_train)
@@ -231,25 +245,28 @@ for te  in text:
 
                 #KTSVM
                 ktsvm = tl.KT_svm()
-                ktsvm.fit(X_train, y_train, pi_var[0])
+                ktsvm.fit(X_train, y_train, pi_var)
                 pre = ktsvm.predict(X_testr)
 
                 ktsvme.append(accuracy_score(y_test, pre))
 
-                #GD
-                #gd = tl.GD()
-                #gd.fit(X_trainp, X_trainr, y_train, omega, beta)
-                #pre = gd.predict(X_testr)
+                y_train01 = (y_train + 1)/2
+                y_test01 = (y_test + 1)/2
 
-                #gd_e.append(accuracy_score(y_test, pre))
+                #GD
+                gd = tl.GD()
+                gd.fit(X_trainp, X_trainr, y_train01, omega_o, beta_o)
+                pre = gd.predict(X_testr)
+
+                gd_e.append(accuracy_score(y_test01, pre))
 
 
                 #PFD
                 pfd = tl.GD()
-                pfd.fit(X_train, X_trainr, y_train, omega, beta)
+                pfd.fit(X_train, X_trainr, y_train01, omega, beta)
                 pre = pfd.predict(X_testr)
 
-                pfd_e.append(accuracy_score(y_test, pre))
+                pfd_e.append(accuracy_score(y_test01, pre))
 
 
 
@@ -260,6 +277,7 @@ for te  in text:
             Tacc_realit.append(np.mean(acc_realit))
             Tacc_realp.append(np.mean(acc_realp))
             Tacc_ub.append(np.mean(acc_ub))
+            Tacc_oub.append(np.mean(acc_oub))
             Tsvmb.append(np.mean(svmb))
             Tsvmplus.append(np.mean(svmplus))
             Tsvmup.append(np.mean(svmup))
@@ -281,10 +299,12 @@ for te  in text:
                             'ACCreal_it':  np.round(np.mean(Tacc_realit), 3),
                             'ACCreal_p':   np.round(np.mean(Tacc_realp), 3),
                             'ACCub':       np.round(np.mean(Tacc_ub), 3),
+                            'ACCoub':       np.round(np.mean(Tacc_oub), 3),
                             'stdlb':       np.round(np.std(Tacc_lb), 3),
                             'stdreal_it':  np.round(np.std(Tacc_realit), 3),
                             'stdreal_p':   np.round(np.std(Tacc_realp), 3),
-                            'stdub':       np.round(np.std(Tacc_ub), 3),                    
+                            'stdub':       np.round(np.std(Tacc_ub), 3),          
+                            'stdoub':       np.round(np.std(Tacc_oub), 3),                              
                             'gain_it':      np.round(gan_it, 3),
                             'gain_p':       np.round(gan_p, 3),
 
@@ -321,8 +341,9 @@ for te  in text:
 
 
 
-#dataLR.to_csv('dataLR1.csv')
-#dataSVM.to_csv('dataSVMmm.csv')
+dataLR.to_csv('dataLR.csv')
+dataSVM.to_csv('dataSVM.csv')
+dataOTHER.to_csv('dataOTHER.csv')
 
 
 # %%
