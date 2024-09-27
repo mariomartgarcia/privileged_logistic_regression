@@ -12,9 +12,8 @@ warnings.filterwarnings("ignore")
 #=========================================================================================================
 url_obesity = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/UCIdataset/ObesityDataSet_raw_and_data_sinthetic.csv'
 url_wine = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/UCIdataset/winequality-white.csv'
-url_heart = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/Discussion_dataset/framingham.csv'
-url_wm = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/Discussion_dataset/WM_data.csv'
-url_heart2 = r'/Users/mmartinez/Desktop/Code/Python/LRPI/Data/Discussion_dataset/heart.csv'
+url_heart = 'data/UCIdataset/framingham.csv'
+url_heart2 = 'data/UCIdataset/heart.csv'
 #=========================================================================================================
 
 
@@ -146,7 +145,7 @@ def wine_reg(c = False):
 #DROGAS
 def drugs(c = False):
     
-    df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/00373/drug_consumption.data', header = None)
+    df = pd.read_csv('data/UCIdataset/drug_consumption.data', header = None)
     df = df.drop([0,14,  15, 16, 17, 19, 21 , 22, 23, 24, 25, 26, 27, 28, 29, 30, 31], axis = 1)
     df = df.rename(columns = {1: 'age',  2: 'gender',  3: 'education',  4: 'country',  5: 'ethnicity',  6: 'nscore',  7: 'escore',  
                          8: 'oscore',  9: 'ascore', 10: 'cscore', 11: 'impulsive', 12: 'ss', 13: 'alcohol', 
@@ -189,7 +188,7 @@ def drugs(c = False):
 
 #SPAM
 def spam(c = False):
-    df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/spambase/spambase.data', header = None)
+    df = pd.read_csv('data/UCIdataset/spambase.data', header = None)
     df = df.rename(columns = {57: 'output'})
     #df.output[df.output == 0] = -1
 
@@ -232,47 +231,6 @@ def heart():
     return X, y
 
 
-#WM
-
-def wm():
-    df = pd.read_csv(url_wm, sep = ',')
-    
-    df.age5[df.age5 == '20-24'] = 1
-    df.age5[df.age5 == '25-29'] = 2
-    df.age5[df.age5 == '30-34'] = 3
-    df.age5[df.age5 == '35-39'] = 4
-    df.age5[df.age5 == '40-44'] = 5
-    df.age5[df.age5 == '45-49'] = 6
-    df.age5[df.age5 == '50-54'] = 7
-    df.age5[df.age5 == '55-59'] = 8
-    df.age5[df.age5 == '60-64'] = 9
-    df.age5[df.age5 == '65-69'] = 10
-    df.age5[df.age5 == '70-74'] = 11
-    df.age5[df.age5 == '75-79'] = 12
-    df.age5[df.age5 == '80-84'] = 13
-
-    df.age5.astype(int)
-    
-    imp = df.drop('wm', axis = 1)
-    index = []
-    for i in range(imp.shape[1]):
-        if len(imp.iloc[:,i].unique()) < 6:
-            if imp.iloc[:,i].isnull().sum() != 0:
-                index.append(i)
-
-    imputer = KNNImputer(n_neighbors=5)
-    i = imputer.fit_transform(imp)
-    imp_correct = pd.DataFrame(i, columns = imp.columns)
-
-    for i in index:
-        for j in range(imp_correct.shape[0]):
-            imp_correct.iloc[j, i] = round(imp_correct.iloc[j, i])
-            
-    X = imp_correct
-    y = df.wm
-    y = 2*y-1
-    return X, y
-
 
 
 
@@ -282,14 +240,14 @@ def wm():
 def heart2():
     df = pd.read_csv(url_heart2, sep = ',')
     X = df.drop('target', axis = 1)
-    y = df.target
+    y = 2*df.target-1
     
     return X, y
 
 
 #Abalone
 def abalone():
-    df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data', header = None)
+    df = pd.read_csv('data/UCIdataset/abalone.data', header = None)
     df = df.rename(columns = {0: 'sex', 1: 'length',  2: 'diameter',  3: 'height',  4: 'whole_weight',  5: 'shucked_weight',  6: 'viscera_weight',  7: 'shell_weight', 8: 'rings'})
     df = df[df['sex'] != 'I'].reset_index(drop = True )
     df['sex'][df['sex'] == 'M'] = 1
@@ -303,7 +261,7 @@ def abalone():
 
 
 def car():
-    df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/car/car.data', header = None)
+    df = pd.read_csv('data/UCIdataset/car.data', header = None)
     df = df.rename(columns = {0: 'buying', 1: 'maint',  2: 'doors',  3: 'persons',  4: 'lug_boot',  5: 'safety',  6: 'output'})     
     df.buying = pd.Categorical(df.buying, ordered = True, categories=['low', 'med', 'high', 'vhigh']).codes
     df.maint = pd.Categorical(df.maint, ordered = True, categories=['low', 'med', 'high', 'vhigh']).codes 
