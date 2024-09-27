@@ -273,8 +273,8 @@ class PrivilegedLogisticRegression(BaseEstimator, LinearClassifierMixin,
 
         problem = cp.Problem(obj, cons)
         try:
-            #problem.solve(max_iter=self.max_iter, verbose=self.verbose) #abstol=self.tol)
-            problem.solve(solver=cp.ECOS, max_iters=self.max_iter, verbose=self.verbose, abstol=self.tol)
+            problem.solve(max_iter=self.max_iter, verbose=True) #abstol=self.tol)
+            #problem.solve(solver=cp.ECOS, max_iters=self.max_iter, verbose=self.verbose, abstol=self.tol)
         except Exception as e:
             warnings.warn('Encountered an error while solving the problem. Hyperparameters may be invalid.' +
                           f'lambda_base: {self.lambda_base}, lambda_star: {self.lambda_star}, '+ 
