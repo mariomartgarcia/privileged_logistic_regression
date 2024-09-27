@@ -29,8 +29,8 @@ def priv_gain(x, lb, ub):
 #===================================
 
 X, y = bs.breast_cancer()
-#X, y = bs.obesity()
-#X, y = bs.wine()
+X, y = bs.obesity()
+X, y = bs.wine()
 
 
 

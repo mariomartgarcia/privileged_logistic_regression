@@ -25,8 +25,8 @@ def priv_gain(x, lb, ub):
 
 # %%
 
-text = ['phishing', 'diabetes', 'wm']
-dc = [bs.phishing(), bs.diabetes(), bs.wm()]
+text = ['phishing', 'diabetes', 'wm', 'drugs', 'spam', 'heart', 'heart2', 'abalone', 'car']
+dc = [bs.phishing(), bs.diabetes(), bs.wm(), bs.drugs(), bs.spam(), bs.heart(), bs.heart2(), bs.abalone(), bs.car()]
 
 
 datasets_dict = dict(zip(text, dc))
@@ -60,7 +60,7 @@ for te  in text:
         mi_sort = mi_df.sort_values(by='mi', ascending=False)
         pi_var = list(mi_sort['name'][0:10])
 
-    if te in ['breast_cancer', 'obesity', 'wine', 'phishing', 'diabetes', 'wm']:
+    if te in ['breast_cancer', 'obesity', 'wine', 'phishing', 'diabetes', 'wm', 'drugs', 'spam', 'heart', 'heart2', 'abalone', 'car']:
         X, y = datasets_dict[te]
         X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
         X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
@@ -208,7 +208,6 @@ for te  in text:
                 svmplus.append(accuracy_score(y_test, tests))
                 #print('prediction', tests)
 
-                print(accuracy_score(y_test, tests))
                 
                 #SVMB
                 svb = svm.SVC(kernel = 'linear' )
@@ -273,8 +272,8 @@ for te  in text:
 
 
 
-#dataLR.to_csv('dataLR1.csv')
-#dataSVM.to_csv('dataSVMmm.csv')
+dataLR.to_csv('dataLRevo.csv')
+dataSVM.to_csv('dataSVMevo.csv')
 
 
 # %%
