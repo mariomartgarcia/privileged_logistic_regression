@@ -25,8 +25,10 @@ def priv_gain(x, lb, ub):
 
 # %%
 
-text = ['kc2', 'parkinsons', 'obesity', 'wine', 'breast_cancer', 'phishing', 'diabetes', 'wm']
-dc = [bs.kc2(), bs.parkinsons(), bs.obesity(), bs.wine(), bs.breast_cancer(), bs.phishing(), bs.diabetes(), bs.wm()]
+text = ['kc2', 'parkinsons', 'obesity', 'wine', 'breast_cancer', 'phishing', 'diabetes', 'wm', 'drugs', 'spam', 'heart', 'heart2', 'abalone', 'car']
+dc = [bs.kc2(), bs.parkinsons(), bs.obesity(), bs.wine(), bs.breast_cancer(), bs.phishing(), bs.diabetes(), bs.wm(), bs.drugs(), bs.spam(), bs.heart(), bs.heart2(), bs.abalone(), bs.car()]
+
+
 
 
 datasets_dict = dict(zip(text, dc))
@@ -60,7 +62,7 @@ for te  in text:
         mi_sort = mi_df.sort_values(by='mi', ascending=False)
         pi_var = list(mi_sort['name'][0:10])
 
-    if te in ['breast_cancer', 'obesity', 'wine', 'phishing', 'diabetes', 'wm']:
+    if te in ['breast_cancer', 'obesity', 'wine', 'phishing', 'diabetes', 'wm', 'drugs', 'spam', 'heart', 'heart2', 'abalone', 'car']:
         X, y = datasets_dict[te]
         X.rename(columns = {'family_history_with_overweight': 'fam. his.'}, inplace = True)
         X.rename(columns = {'fixed acidity': 'fix. acid.', 'volatile acidity': 'vol. acid.', 
