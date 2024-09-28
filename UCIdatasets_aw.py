@@ -25,9 +25,11 @@ def priv_gain(x, lb, ub):
 
 # %%
 
-text = ['phishing', 'diabetes', 'wm', 'drugs', 'spam', 'heart', 'heart2', 'abalone', 'car']
-dc = [bs.phishing(), bs.diabetes(), bs.wm(), bs.drugs(), bs.spam(), bs.heart(), bs.heart2(), bs.abalone(), bs.car()]
+#text = ['phishing', 'diabetes', 'wm', 'drugs', 'spam', 'heart', 'heart2', 'abalone', 'car']
+#dc = [bs.phishing(), bs.diabetes(), bs.wm(), bs.drugs(), bs.spam(), bs.heart(), bs.heart2(), bs.abalone(), bs.car()]
 
+text = ['phishing',  'spam', 'heart']
+dc = [bs.phishing(), bs.spam(), bs.heart()]
 
 datasets_dict = dict(zip(text, dc))
 
@@ -111,8 +113,9 @@ for te  in text:
         print(p)
         print('---------')
 
-        Tacc_lb, Tacc_ub, Tacc_realit, Tacc_realp = [], [], [], []
-        Tsvmup, Tsvmplus, Tsvmb = [], [], []
+
+        acc_lb, acc_ub, acc_realit, acc_realp = [], [], [], []
+        svmup, svmplus, svmb, svmplus1 = [], [], [], []
 
         pi_var = names[0:p]
 
@@ -120,8 +123,6 @@ for te  in text:
             
             dr = tl.skfold(X, y, cv, r = k)
 
-            acc_lb, acc_ub, acc_realit, acc_realp = [], [], [], []
-            svmup, svmplus, svmb = [], [], []
 
             for h in range(cv):
                 X_train = dr['X_train' + str(h)]
@@ -204,8 +205,13 @@ for te  in text:
 
                 svmp.fit(X_trainr, X_trainp, y_train)
                 tests= svmp.predict(X_testr)
+                if accuracy_score(y_test, tests) < 0.5:
+                    svmplus.append(1- accuracy_score(y_test, tests))
+                else:
+                    svmplus.append(accuracy_score(y_test, tests))
 
-                svmplus.append(accuracy_score(y_test, tests))
+                svmplus1.append(accuracy_score(y_test, tests))
+                
                 #print('prediction', tests)
 
                 
@@ -223,31 +229,31 @@ for te  in text:
 
 
 
-            Tacc_lb.append(np.mean(acc_lb))
-            Tacc_realit.append(np.mean(acc_realit))
-            Tacc_realp.append(np.mean(acc_realp))
-            Tacc_ub.append(np.mean(acc_ub))
-            Tsvmb.append(np.mean(svmb))
-            Tsvmplus.append(np.mean(svmplus))
-            Tsvmup.append(np.mean(svmup))
+            #Tacc_lb.append(np.mean(acc_lb))
+            #Tacc_realit.append(np.mean(acc_realit))
+            #Tacc_realp.append(np.mean(acc_realp))
+            #Tacc_ub.append(np.mean(acc_ub))
+            #Tsvmb.append(np.mean(svmb))
+            #Tsvmplus.append(np.mean(svmplus))
+            #Tsvmup.append(np.mean(svmup))
 
 
                 
-        gan_it = priv_gain(np.mean(Tacc_realit), np.mean(Tacc_lb), np.mean(Tacc_ub))
-        gan_p = priv_gain(np.mean(Tacc_realp), np.mean(Tacc_lb), np.mean(Tacc_ub))
-        gan_svm = priv_gain(np.mean(Tsvmplus), np.mean(Tsvmb), np.mean(Tsvmup))
+        gan_it = priv_gain(np.mean(acc_realit), np.mean(acc_lb), np.mean(acc_ub))
+        gan_p = priv_gain(np.mean(acc_realp), np.mean(acc_lb), np.mean(acc_ub))
+        gan_svm = priv_gain(np.mean(svmplus), np.mean(svmb), np.mean(svmup))
 
         data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
                             'dataset': te,
                             'per_train': p,
-                            'ACClb':       np.round(np.mean(Tacc_lb), 3),
-                            'ACCreal_it':  np.round(np.mean(Tacc_realit), 3),
-                            'ACCreal_p':   np.round(np.mean(Tacc_realp), 3),
-                            'ACCub':       np.round(np.mean(Tacc_ub), 3),
-                            'stdlb':       np.round(np.std(Tacc_lb), 3),
-                            'stdreal_it':  np.round(np.std(Tacc_realit), 3),
-                            'stdreal_p':   np.round(np.std(Tacc_realp), 3),
-                            'stdub':       np.round(np.std(Tacc_ub), 3),                    
+                            'ACClb':       np.round(np.mean(acc_lb), 3),
+                            'ACCreal_it':  np.round(np.mean(acc_realit), 3),
+                            'ACCreal_p':   np.round(np.mean(acc_realp), 3),
+                            'ACCub':       np.round(np.mean(acc_ub), 3),
+                            'stdlb':       np.round(np.std(acc_lb), 3),
+                            'stdreal_it':  np.round(np.std(acc_realit), 3),
+                            'stdreal_p':   np.round(np.std(acc_realp), 3),
+                            'stdub':       np.round(np.std(acc_ub), 3),                    
                             'gain_it':      np.round(gan_it, 3),
                             'gain_p':       np.round(gan_p, 3),
 
@@ -256,12 +262,14 @@ for te  in text:
         data_svm = pd.DataFrame({#'nPI': range(1, number_pi),
                             'dataset': te,
                             'per_train': p,
-                            'ACCsvmb':    np.round(np.mean(Tsvmb), 3),
-                            'ACCsvmplus': np.round(np.mean(Tsvmplus), 3),
-                            'ACCsvmup':   np.round(np.mean(Tsvmup), 3),
-                            'stdsvmb':    np.round(np.std(Tsvmb), 3),
-                            'stdsvmplus': np.round(np.std(Tsvmplus), 3),
-                            'stdsvmup':   np.round(np.std(Tsvmup), 3),                      
+                            'ACCsvmb':    np.round(np.mean(svmb), 3),
+                            'ACCsvmplus': np.round(np.mean(svmplus), 3),
+                            'ACCsvmplus1': np.round(np.mean(svmplus1), 3),
+                            'ACCsvmup':   np.round(np.mean(svmup), 3),
+                            'stdsvmb':    np.round(np.std(svmb), 3),
+                            'stdsvmplus': np.round(np.std(svmplus), 3),
+                            'stdsvmplus1': np.round(np.std(svmplus1), 3),
+                            'stdsvmup':   np.round(np.std(svmup), 3),                      
                             'gain_svm':   np.round(gan_svm, 3),
 
                             }, index = [0])
@@ -272,8 +280,8 @@ for te  in text:
 
 
 
-dataLR.to_csv('dataLRevo.csv')
-dataSVM.to_csv('dataSVMevo.csv')
+dataLR.to_csv('dataLRevo1.csv')
+dataSVM.to_csv('dataSVMevo1.csv')
 
 
 # %%
