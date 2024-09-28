@@ -113,18 +113,16 @@ for te  in text:
         print(p)
         print('---------')
 
-        Tacc_lb, Tacc_ub, Tacc_oub, Tacc_realit, Tacc_realp = [ [] for i in range(5)]
-        Tsvmup, Tsvmplus, Tsvmb = [], [], []
-        Tplr, Tktsvme, Tgd_e, Tpfd_e = [[] for i in range(4)]
+        acc_lb, acc_ub, acc_oub, acc_realit, acc_realp = [ [] for i in range(5)]
+        svmup, svmplus, svmb = [], [], []
+        plr_m, ktsvme, gd_e, pfd_e = [[] for i in range(4)]
+
 
 
         for k in r:
             
             dr = tl.skfold(X, y, cv, r = k)
 
-            acc_lb, acc_ub, acc_oub, acc_realit, acc_realp = [ [] for i in range(5)]
-            svmup, svmplus, svmb = [], [], []
-            plr_m, ktsvme, gd_e, pfd_e = [[] for i in range(4)]
 
             for h in range(cv):
                 X_train = dr['X_train' + str(h)]
@@ -275,38 +273,26 @@ for te  in text:
 
 
 
-            Tacc_lb.append(np.mean(acc_lb))
-            Tacc_realit.append(np.mean(acc_realit))
-            Tacc_realp.append(np.mean(acc_realp))
-            Tacc_ub.append(np.mean(acc_ub))
-            Tacc_oub.append(np.mean(acc_oub))
-            Tsvmb.append(np.mean(svmb))
-            Tsvmplus.append(np.mean(svmplus))
-            Tsvmup.append(np.mean(svmup))
 
-            Tplr.append(np.mean(plr_m))
-            Tktsvme.append(np.mean(ktsvme))
-            Tgd_e.append(np.mean(gd_e))
-            Tpfd_e.append(np.mean(pfd_e))
 
                 
-        gan_it = priv_gain(np.mean(Tacc_realit), np.mean(Tacc_lb), np.mean(Tacc_ub))
-        gan_p = priv_gain(np.mean(Tacc_realp), np.mean(Tacc_lb), np.mean(Tacc_ub))
-        gan_svm = priv_gain(np.mean(Tsvmplus), np.mean(Tsvmb), np.mean(Tsvmup))
+        gan_it = priv_gain(np.mean(acc_realit), np.mean(acc_lb), np.mean(acc_ub))
+        gan_p = priv_gain(np.mean(acc_realp), np.mean(acc_lb), np.mean(acc_ub))
+        gan_svm = priv_gain(np.mean(svmplus), np.mean(svmb), np.mean(svmup))
 
         data_lr = pd.DataFrame({#'nPI': range(1, number_pi),
                             'dataset': te,
                             'per_train': p,
-                            'ACClb':       np.round(np.mean(Tacc_lb), 3),
-                            'ACCreal_it':  np.round(np.mean(Tacc_realit), 3),
-                            'ACCreal_p':   np.round(np.mean(Tacc_realp), 3),
-                            'ACCub':       np.round(np.mean(Tacc_ub), 3),
-                            'ACCoub':       np.round(np.mean(Tacc_oub), 3),
-                            'stdlb':       np.round(np.std(Tacc_lb), 3),
-                            'stdreal_it':  np.round(np.std(Tacc_realit), 3),
-                            'stdreal_p':   np.round(np.std(Tacc_realp), 3),
-                            'stdub':       np.round(np.std(Tacc_ub), 3),          
-                            'stdoub':       np.round(np.std(Tacc_oub), 3),                              
+                            'ACClb':       np.round(np.mean(acc_lb), 3),
+                            'ACCreal_it':  np.round(np.mean(acc_realit), 3),
+                            'ACCreal_p':   np.round(np.mean(acc_realp), 3),
+                            'ACCub':       np.round(np.mean(acc_ub), 3),
+                            'ACCoub':       np.round(np.mean(acc_oub), 3),
+                            'stdlb':       np.round(np.std(acc_lb), 3),
+                            'stdreal_it':  np.round(np.std(acc_realit), 3),
+                            'stdreal_p':   np.round(np.std(acc_realp), 3),
+                            'stdub':       np.round(np.std(acc_ub), 3),          
+                            'stdoub':       np.round(np.std(acc_oub), 3),                              
                             'gain_it':      np.round(gan_it, 3),
                             'gain_p':       np.round(gan_p, 3),
 
@@ -315,26 +301,26 @@ for te  in text:
         data_svm = pd.DataFrame({#'nPI': range(1, number_pi),
                             'dataset': te,
                             'per_train': p,
-                            'ACCsvmb':    np.round(np.mean(Tsvmb), 3),
-                            'ACCsvmplus': np.round(np.mean(Tsvmplus), 3),
-                            'ACCsvmup':   np.round(np.mean(Tsvmup), 3),
-                            'stdsvmb':    np.round(np.std(Tsvmb), 3),
-                            'stdsvmplus': np.round(np.std(Tsvmplus), 3),
-                            'stdsvmup':   np.round(np.std(Tsvmup), 3),                      
+                            'ACCsvmb':    np.round(np.mean(svmb), 3),
+                            'ACCsvmplus': np.round(np.mean(svmplus), 3),
+                            'ACCsvmup':   np.round(np.mean(svmup), 3),
+                            'stdsvmb':    np.round(np.std(svmb), 3),
+                            'stdsvmplus': np.round(np.std(svmplus), 3),
+                            'stdsvmup':   np.round(np.std(svmup), 3),                      
                             'gain_svm':   np.round(gan_svm, 3),
 
                             }, index = [0])
         
         data_other = pd.DataFrame({#'nPI': range(1, number_pi),
                             'dataset': te,
-                            'ACCplr':    np.round(np.mean(Tplr), 3),
-                            'std_plr':    np.round(np.std(Tplr), 3),  
-                            'ACCktsvm':    np.round(np.mean(Tktsvme), 3),
-                            'std_ktsvm':    np.round(np.std(Tktsvme), 3), 
-                             'ACCgd':    np.round(np.mean(Tgd_e), 3),
-                            'std_gd':    np.round(np.std(Tgd_e), 3), 
-                             'ACCpfd':    np.round(np.mean(Tpfd_e), 3),
-                            'std_pfd':    np.round(np.std(Tpfd_e), 3),                    
+                            'ACCplr':    np.round(np.mean(plr_m), 3),
+                            'std_plr':    np.round(np.std(plr_m), 3),  
+                            'ACCktsvm':    np.round(np.mean(ktsvme), 3),
+                            'std_ktsvm':    np.round(np.std(ktsvme), 3), 
+                             'ACCgd':    np.round(np.mean(gd_e), 3),
+                            'std_gd':    np.round(np.std(gd_e), 3), 
+                             'ACCpfd':    np.round(np.mean(pfd_e), 3),
+                            'std_pfd':    np.round(np.std(pfd_e), 3),                    
                             }, index = [0])
 
         dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
@@ -343,9 +329,9 @@ for te  in text:
 
 
 
-dataLR.to_csv('dataLR.csv')
-dataSVM.to_csv('dataSVM.csv')
-dataOTHER.to_csv('dataOTHER.csv')
+dataLR.to_csv('dataLR1.csv')
+dataSVM.to_csv('dataSVM1.csv')
+dataOTHER.to_csv('dataOTHER1.csv')
 
 
 # %%
