@@ -343,9 +343,9 @@ for te  in text:
 
 
 
-dataLR.to_csv('dataLR1.csv')
-dataSVM.to_csv('dataSVM1.csv')
-dataOTHER.to_csv('dataOTHER1.csv')
+dataLR.to_csv('dataLR2.csv')
+dataSVM.to_csv('dataSVM2.csv')
+dataOTHER.to_csv('dataOTHER2.csv')
 
 
 # %%
