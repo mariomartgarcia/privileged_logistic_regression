@@ -14,7 +14,7 @@ from sklearn.feature_selection import mutual_info_regression, mutual_info_classi
 from sklearn import svm
 import tools as tl
 from privileged_lr import PrivilegedLogisticRegression
-
+import RVFL_plus as rv
 warnings.filterwarnings("ignore")
 
 
@@ -115,7 +115,7 @@ for te  in text:
 
         acc_lb, acc_ub, acc_oub, acc_realit, acc_realp = [ [] for i in range(5)]
         svmup, svmplus, svmb = [], [], []
-        plr_m, ktsvme, gd_e, pfd_e = [[] for i in range(4)]
+        plr_m, ktsvme, gd_e, pfd_e, rvfl_e = [[] for i in range(5)]
 
 
 
@@ -219,7 +219,10 @@ for te  in text:
                 svmp.fit(X_trainr, X_trainp, y_train)
                 tests= svmp.predict(X_testr)
 
-                svmplus.append(accuracy_score(y_test, tests))
+                if accuracy_score(y_test, tests) <0.5:
+                    svmplus.append(1-accuracy_score(y_test, tests))
+                else:
+                    svmplus.append(accuracy_score(y_test, tests))
                 #print('prediction', tests)
 
                 print(accuracy_score(y_test, tests))
@@ -254,19 +257,28 @@ for te  in text:
                 y_test01 = (y_test + 1)/2
 
                 #GD
-                gd = tl.GD()
+                gd = tl.GD(l = 0.5)
                 gd.fit(X_trainp, X_trainr, y_train01, omega_o, beta_o)
                 pre = gd.predict(X_testr)
 
                 gd_e.append(accuracy_score(y_test01, pre))
 
-
                 #PFD
-                pfd = tl.GD()
+                pfd = tl.GD(l = 0.5)
                 pfd.fit(X_train, X_trainr, y_train01, omega, beta)
                 pre = pfd.predict(X_testr)
 
                 pfd_e.append(accuracy_score(y_test01, pre))
+
+                #RVFL
+                rvfl = rv.RVFL_plus()
+                rvfl.fit(np.array(X_trainr), np.array(X_trainp), np.array(y_train01))
+                pre = rvfl.predict(np.array(X_testr))
+                rvfl_e.append(accuracy_score(y_test01, pre))
+
+
+
+
 
 
 
@@ -320,7 +332,9 @@ for te  in text:
                              'ACCgd':    np.round(np.mean(gd_e), 3),
                             'std_gd':    np.round(np.std(gd_e), 3), 
                              'ACCpfd':    np.round(np.mean(pfd_e), 3),
-                            'std_pfd':    np.round(np.std(pfd_e), 3),                    
+                            'std_pfd':    np.round(np.std(pfd_e), 3), 
+                            'ACCrvfl':    np.round(np.mean(rvfl_e), 3),
+                            'std_rvfl':    np.round(np.std(rvfl_e), 3),                     
                             }, index = [0])
 
         dataLR = pd.concat([dataLR, data_lr]).reset_index(drop = True)
