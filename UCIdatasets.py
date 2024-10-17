@@ -13,7 +13,6 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.feature_selection import mutual_info_regression, mutual_info_classif
 from sklearn import svm
 import tools as tl
-from privileged_lr import PrivilegedLogisticRegression
 
 warnings.filterwarnings("ignore")
 
