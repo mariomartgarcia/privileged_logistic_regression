@@ -132,6 +132,15 @@ Mario Martínez García - mmartinez@bcamath.org
 The corresponding BiBTeX citation is given below:
 
 
+@article{cite-key,
+	author = {Mart{\'\i}nez-Garc{\'\i}a, Mario and Garc{\'\i}a-Gutierrez, Susana and Barre{\~n}ada, Lasai and Inza, I{\~n}aki and Lozano, Jose A.},
+	journal = {Neurocomputing},
+	pages = {128869},
+	title = {Extending the learning using privileged information paradigm to logistic regression},
+	year = {2024}}
+
+
+
 ## References
 
 [^1]: Vapnik, V., Vashist, A.: A new learning paradigm: Learning using privileged information. Neural Networks 22(5), 544–557 (2009)
