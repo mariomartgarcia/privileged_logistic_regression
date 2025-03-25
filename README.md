@@ -131,6 +131,17 @@ Mario Martínez García - mmartinez@bcamath.org
 
 The corresponding BiBTeX citation is given below:
 
+```bib
+@article{cite-key, 
+	author = {Martínez-García, Mario and García-Gutierrez, Susana and Barreñada, Lasai and Inza, Iñaki and Lozano, Jose A.}, 
+	journal = {Neurocomputing}, 
+	pages = {128869},
+	title = {Extending the learning using privileged information paradigm to logistic regression}, 
+	year = {2024}, 
+ 	doi = {https://doi.org/10.1016/j.neucom.2024.128869}}
+```
+
+
 
 ## References
 
