@@ -337,12 +337,12 @@ s = pd.DataFrame({'ACC_logit': ACC_logit, 'ACC_proba': ACC_proba, 'ACC_lb': ACC_
 #sd = pd.read_csv(r'/Users/mmartinez/Desktop/LR+ Paper/privileged_logistic_regression/code/results/mnist/rep_Vapnik.csv')
 
 # %%
-s = pd.read_csv(r'/Users/mmartinez/Desktop/LR+ Paper/privileged_logistic_regression/code/results/mnist/repC_Vapnik.csv')
-ACC_logit = s['ACC_logit']
-ACC_proba = s['ACC_proba']
-ACC_lb = s['ACC_lb']
-ACCsvmplus = s['ACCsvmplus']
-ACCsvmb = s['ACC_svmb']
+s = pd.read_csv(r'/Users/mmartinez/Desktop/Submitted Papers/LR+ Paper/privLR_Modification_IS/code/results/mnist/repC_Vapnik.csv')
+ACC_logit = 1 - s['ACC_logit']
+ACC_proba = 1 - s['ACC_proba']
+ACC_lb = 1 - s['ACC_lb']
+ACCsvmplus = 1 - s['ACCsvmplus']
+ACCsvmb = 1 - s['ACC_svmb']
 
 
 # %%
@@ -366,11 +366,12 @@ plt.plot(tds, np.array(ACCsvmplus), 'v-.', c = 'darkmagenta', label = 'SVM+', al
 plt.grid(True)
 plt.xticks(fontsize = 23)
 plt.yticks(fontsize = 23)
-plt.ylabel('Accuracy', fontweight="bold", fontsize = 25)
+plt.ylabel('Error Rate', fontweight="bold", fontsize = 25)
 plt.xlabel('Training data size', fontweight="bold", fontsize = 25)
 plt.legend(fontsize = 23)
-plt.savefig(r'/Users/mmartinez/Desktop/LR+ Paper/privileged_logistic_regression/code/results/mnist/mnist30.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
+plt.savefig(r'image/error_rate_mnist30.pdf', format='pdf', transparent = True, dpi = 300,  bbox_inches='tight')
 plt.show()
 
 
         
+# %%
